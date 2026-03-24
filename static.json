@@ -1,0 +1,20 @@
+{
+  "rewrites": [
+    {
+      "source": "/maps/**",
+      "destination": "https://maps.googleapis.com/maps/:splat"
+    },
+    {
+      "source": "/admins/**",
+      "destination": "https://user-api.resque.ng/:splat"
+    },
+    {
+      "source": "/wallet/**",
+      "destination": "https://booking-service.resque.ng/wallet/:splat"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

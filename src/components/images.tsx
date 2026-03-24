@@ -1,0 +1,42 @@
+const Images = {
+    authbg: "/images/authbg.png",
+    logo: "/images/logo.svg",
+    logodark: "/images/icons/logo-dark.svg",
+    success: "/images/success.png",
+    smallLogo: "/images/smallLogo.svg",
+    avatar: "/images/Avatar.png",
+    vectorbg: "/images/vectors.svg",
+    greetings: "/images/greetings.svg",
+    ads: "/images/ads.svg",
+    ads2: "/images/ads2.svg",
+    teambg: "/images/teamsbg.svg",
+    profile: "/images/profile.png",
+    user: "/images/userImage.png",
+    map: "/images/lagos.png",
+    ambulance: "/images/ambulance.svg",
+    ambulancebg: "/images/details.svg",
+
+    icon: {
+      dashboard: "/images/icons/home.svg",
+      bookings: "/images/icons/bookings.svg",
+      patients: "/images/icons/patients.svg",
+      serviceProviders: "/images/icons/providers.svg",
+      hospitals: "/images/icons/hospitals.svg",
+      revenue: "/images/icons/revenue.svg",
+      setup: "/images/icons/setup.svg",
+      myTeam: "/images/icons/patients.svg",
+      activityLog: "/images/icons/activity.svg",
+      siderIcon: "/images/Expand icon.svg",
+      filter: "/images/icons/filter.svg",
+      medal: "/images/medal.svg",
+      fav: "/images/icons/fav.svg",
+      siren: "/images/icons/siren.svg",
+      ambulance: "/images/icons/ambulance.svg",
+      naira: "/images/icons/naira.svg",
+      caution: "/images/icons/caution.svg",
+      question: "/images/icons/question.svg",
+    },
+  };
+  
+export default Images;
+  

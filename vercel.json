@@ -1,0 +1,20 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://user-api.resque.ng/api/:path*"
+    },
+    {
+      "source": "/wallet/:path*",
+      "destination": "⁠https://booking-service.resque.ng/wallet/:path*"
+    },
+    {
+      "source": "/maps/:path*",
+      "destination": "https://maps.googleapis.com/maps/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/"
+    }
+  ]
+} 
