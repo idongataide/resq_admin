@@ -35,6 +35,8 @@ const AddProviderModal: React.FC<AddProviderModalProps> = ({
   const autocompleteTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { mutate: globalMutate } = useSWRConfig();
 
+  console.log(loadingAddress);
+
   // Reset form when modal closes
   useEffect(() => {
     if (!open) {

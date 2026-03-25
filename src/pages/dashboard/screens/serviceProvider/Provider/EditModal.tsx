@@ -37,6 +37,8 @@ const UpdateProviderModal: React.FC<UpdateProviderModalProps> = ({
   const autocompleteTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { mutate: globalMutate } = useSWRConfig();
 
+  console.log("Provider data in EditModal:", loadingAddress);
+
   // Set form values when provider data changes
   useEffect(() => {
     if (provider && open) {

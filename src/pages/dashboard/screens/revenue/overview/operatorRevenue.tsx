@@ -1,11 +1,17 @@
 // OperatorRevenue.tsx
-import { Table, Button} from "antd";
+import { Table, Button } from "antd";
 import { FiClock, FiDollarSign } from "react-icons/fi";
 
+interface OperatorData {
+  key: string;
+  dateJoined: string;
+  operatorName: string;
+  operatorEarning: string;
+  totalRequest: string;
+}
 
 const OperatorRevenue = () => {
-
-  const data = [
+  const data: OperatorData[] = [
     {
       key: "1",
       dateJoined: "12th Jan. 2025",
@@ -64,14 +70,14 @@ const OperatorRevenue = () => {
     },
   ];
 
-  // Table columns
+  // Table columns with proper types
   const columns = [
     {
       title: "Date Joined",
       dataIndex: "dateJoined",
       key: "dateJoined",
-      sorter: (a, b) => a.dateJoined.localeCompare(b.dateJoined),
-      render: (text) => (
+      sorter: (a: OperatorData, b: OperatorData) => a.dateJoined.localeCompare(b.dateJoined),
+      render: (text: string) => (
         <div className="flex items-center gap-2">
           <FiClock className="text-gray-400" />
           <span>{text}</span>
@@ -82,18 +88,18 @@ const OperatorRevenue = () => {
       title: "Operator Name",
       dataIndex: "operatorName",
       key: "operatorName",
-      sorter: (a, b) => a.operatorName.localeCompare(b.operatorName),
+      sorter: (a: OperatorData, b: OperatorData) => a.operatorName.localeCompare(b.operatorName),
     },
     {
       title: "Operator Earning",
       dataIndex: "operatorEarning",
       key: "operatorEarning",
-      sorter: (a, b) => {
-        const numA = parseInt(a.operatorEarning.replace(/[₦,]/g, ''));
-        const numB = parseInt(b.operatorEarning.replace(/[₦,]/g, ''));
+      sorter: (a: OperatorData, b: OperatorData) => {
+        const numA = parseFloat(a.operatorEarning.replace(/[₦,]/g, ''));
+        const numB = parseFloat(b.operatorEarning.replace(/[₦,]/g, ''));
         return numA - numB;
       },
-      render: (text) => (
+      render: (text: string) => (
         <div className="flex items-center gap-2">
           <FiDollarSign className="text-gray-400" />
           <span className="font-medium">{text}</span>
@@ -104,7 +110,9 @@ const OperatorRevenue = () => {
       title: "Total Request",
       dataIndex: "totalRequest",
       key: "totalRequest",
-      sorter: (a, b) => parseInt(a.totalRequest) - parseInt(b.totalRequest),
+      sorter: (a: OperatorData, b: OperatorData) => {
+        return parseInt(a.totalRequest) - parseInt(b.totalRequest);
+      },
     },
   ];
 

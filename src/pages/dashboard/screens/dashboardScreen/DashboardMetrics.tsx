@@ -14,6 +14,7 @@ const DashboardMetrics: React.FC = () => {
     start_date: '',
     end_date: ''
   });
+  console.log(dateRange);
 
   // Function to calculate date range based on selected period
   const calculateDateRange = (period: Period) => {

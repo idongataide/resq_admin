@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Table, Button, Input, Space, Dropdown, Menu, Tag, Modal, Form, Select } from "antd";
+import type { ColumnsType } from "antd/es/table";
 import { 
   SearchOutlined, 
   FilterOutlined, 
@@ -18,7 +19,6 @@ import DeleteConfirmationModal from "./deleteMember";
 import { FiX } from "react-icons/fi";
 
 const { Option } = Select;
-
 
 interface AdminUser {
   auth_id: string;
@@ -142,8 +142,8 @@ const UserManagementTable = () => {
     </Menu>
   );
 
-  // Table columns
-  const columns = [
+  // Table columns with proper types
+  const columns: ColumnsType<AdminUser> = [
     {
       title: "S/N",
       key: "sn",
@@ -181,7 +181,7 @@ const UserManagementTable = () => {
         { text: "Manager", value: "Manager" },
         { text: "Staff", value: "Staff" },
       ],
-      onFilter: (value: string, record: AdminUser) => record.position === value,
+      onFilter: (value: any, record: AdminUser) => record.position === value,
     },
     {
       title: "Access Level",
@@ -217,7 +217,7 @@ const UserManagementTable = () => {
         { text: "Active", value: 0 },
         { text: "Suspended", value: 1 },
       ],
-      onFilter: (value: number, record: AdminUser) => record.account_status === value,
+      onFilter: (value: any, record: AdminUser) => record.account_status === value,
     },
     {
       title: "Actions",

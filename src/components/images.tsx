@@ -13,6 +13,7 @@ const Images = {
     profile: "/images/profile.png",
     user: "/images/userImage.png",
     map: "/images/lagos.png",
+    response: "/images/response.png",
     ambulance: "/images/ambulance.svg",
     ambulancebg: "/images/details.svg",
 

@@ -2,9 +2,17 @@
 import { Table, Button } from "antd";
 import { FiClock } from "react-icons/fi";
 
-const StakeholderPayout = () => {
+interface StakeholderData {
+  key: string;
+  dateJoined: string;
+  beneficiary: string;
+  amountDue: string;
+  bankName: string;
+  accountNumber: string;
+}
 
-  const data = [
+const StakeholderPayout = () => {
+  const data: StakeholderData[] = [
     {
       key: "1",
       dateJoined: "12th Jan. 2025",
@@ -103,14 +111,14 @@ const StakeholderPayout = () => {
     },
   ];
 
-  // Table columns
+  // Table columns with proper types
   const columns = [
     {
       title: "Date Joined",
       dataIndex: "dateJoined",
       key: "dateJoined",
-      sorter: (a, b) => a.dateJoined.localeCompare(b.dateJoined),
-      render: (text) => (
+      sorter: (a: StakeholderData, b: StakeholderData) => a.dateJoined.localeCompare(b.dateJoined),
+      render: (text: string) => (
         <div className="flex items-center gap-2">
           <FiClock className="text-gray-400" />
           <span>{text}</span>
@@ -120,22 +128,30 @@ const StakeholderPayout = () => {
     {
       title: "Beneficiary",
       dataIndex: "beneficiary",
-      key: "beneficiary",      
+      key: "beneficiary",
+      sorter: (a: StakeholderData, b: StakeholderData) => a.beneficiary.localeCompare(b.beneficiary),
     },
     {
       title: "Amount Due",
       dataIndex: "amountDue",
       key: "amountDue",
+      sorter: (a: StakeholderData, b: StakeholderData) => {
+        const numA = parseFloat(a.amountDue.replace(/[₦,]/g, ''));
+        const numB = parseFloat(b.amountDue.replace(/[₦,]/g, ''));
+        return numA - numB;
+      },
     },
     {
       title: "Bank Name",
       dataIndex: "bankName",
-      key: "bankName",  
+      key: "bankName",
+      sorter: (a: StakeholderData, b: StakeholderData) => a.bankName.localeCompare(b.bankName),
     },
     {
       title: "Account Number",
       dataIndex: "accountNumber",
       key: "accountNumber",
+      sorter: (a: StakeholderData, b: StakeholderData) => a.accountNumber.localeCompare(b.accountNumber),
     },
   ];
 

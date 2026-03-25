@@ -286,7 +286,7 @@ const BookingList = () => {
         { text: 'Completed', value: 'COMPLETED' },
         { text: 'Cancelled', value: 'CANCELED' },
         ],
-        onFilter: (value: string, record: Booking) => record.booking_status === value,
+        onFilter: (value: boolean | React.Key, record: Booking) => record.booking_status === String(value),
     },
     {
       title: "Action",
@@ -319,7 +319,7 @@ const BookingList = () => {
   ];
 
   return (
-    <div className="p-2 bg-white min-h-screen">
+    <div className="p-2 bg-white min-h-screen rounded-2xl">
       <div className="bg-white rounded-xl overflow-hidden">
         {/* Header with Search and Filter */}
         <div className="p-6 border-b border-gray-200">

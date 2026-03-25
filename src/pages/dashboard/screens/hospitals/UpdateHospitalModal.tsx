@@ -37,6 +37,8 @@ const UpdateHospitalModal: React.FC<UpdateHospitalModalProps> = ({
   const autocompleteTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { mutate: globalMutate } = useSWRConfig();
 
+  console.log(loadingAddress);
+
   // Set form values when hospital data changes
   useEffect(() => {
     if (hospital && open) {

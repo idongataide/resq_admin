@@ -38,7 +38,7 @@ const AmbulanceLeads = () => {
   const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
   const [selectedLead, setSelectedLead] = useState<AmbulanceLead | null>(null);
 
-  const { data: leads, isLoading, mutate } = useProviderAmbulanceLeads(provider_id);
+  const { data: leads, isLoading } = useProviderAmbulanceLeads(provider_id);
 
   // Format date
   const formatDate = (dateString: string) => {

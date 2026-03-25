@@ -118,7 +118,7 @@ const BusinessProcessTable = () => {
       title: "File",
       dataIndex: "file",
       key: "file",
-      render: (text: string, record: BusinessProcess) => (
+      render: (_: any, record: BusinessProcess) => (
         record.file ? (
           <a 
             href={record.file} 

@@ -153,14 +153,13 @@ const StakeholderDisbursementTable = () => {
       dataIndex: "bank_name",
       key: "bank_name",
       filters: bankFilters,
-      onFilter: (value: string, record: StakeholderDisplay) => record.bank_name === value,
     },
     {
       title: "Value",
       dataIndex: "amount",
       key: "amount",
       sorter: (a: StakeholderDisplay, b: StakeholderDisplay) => a.amount - b.amount,
-      render: (text: number, record: StakeholderDisplay) => (
+      render: (_: any, record: StakeholderDisplay) => (
         <span className="font-medium text-[#DB4A47]">
           {formatAmount(record.amount, record.amount_type)}
         </span>

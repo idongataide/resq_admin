@@ -1,6 +1,5 @@
-// components/DeleteConfirmationModal.tsx
 import { Modal, Button } from "antd";
-import { FiX, FiAlertTriangle } from "react-icons/fi";
+import { FiX } from "react-icons/fi";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useSWRConfig } from "swr";

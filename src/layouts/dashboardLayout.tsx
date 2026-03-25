@@ -216,7 +216,7 @@ const DashboardLayout: React.FC = () => {
                 </div>
               </div>
             </div>
-            <section className="px-6 mt-20">
+            <section className="mt-13">
               <Outlet />
             </section>
           </div>

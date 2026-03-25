@@ -4,7 +4,14 @@ import {
 } from "react-icons/fi";
 import { FaStar, FaRegStar } from "react-icons/fa";
 
-const RatingsReview = () => {
+interface RatingsReviewProps {
+  booking: any;
+}
+
+  const RatingsReview: React.FC<RatingsReviewProps> = ({ booking }) => {
+  console.log("Booking data in RatingsReview:", booking);
+
+
   const reviews = {
     userService: {
       title: "Great ambulance service",
@@ -19,7 +26,7 @@ const RatingsReview = () => {
   };
 
   // Helper function to render stars
-  const renderStars = (rating) => {
+  const renderStars = (rating: number) => {
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 >= 0.5;
     const stars = [];

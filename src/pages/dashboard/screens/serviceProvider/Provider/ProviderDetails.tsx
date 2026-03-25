@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   FaEnvelope,
@@ -10,7 +10,6 @@ import {
 } from "react-icons/fa";
 import { Button, Spin } from "antd";
 import Images from "@/components/images";
-import toast from "react-hot-toast";
 import UpdateProviderModal from "./EditModal";
 import { useSingleProvider } from "@/hooks/useProvider";
 

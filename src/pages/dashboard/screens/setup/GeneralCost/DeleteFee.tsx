@@ -6,6 +6,11 @@ import { deleteFee } from "@/api/settingsApi";
 import { useSWRConfig } from "swr";
 import Images from "@/components/images";
 
+interface Fee {
+  fee_id: string;
+  // Add other properties if needed
+}
+
 interface DeleteFeeModalProps {
   open: boolean;
   onClose: () => void;

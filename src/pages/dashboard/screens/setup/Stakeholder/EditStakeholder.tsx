@@ -72,7 +72,7 @@ const UpdateStakeholderModal: React.FC<UpdateStakeholderModalProps> = ({
     }
   }, [open, form]);
 
-  const handleBankNameChange = (value: string, option: any) => {
+  const handleBankNameChange = (value: string, _: any) => {
     const bank = bankList?.find((b: Bank) => b.name === value);
     if (bank) {
       setSelectedBank(bank);

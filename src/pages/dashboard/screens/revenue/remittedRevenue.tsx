@@ -1,10 +1,21 @@
 // OperatorRevenue.tsx
-import { Table, Button} from "antd";
-import { FiClock, FiDollarSign } from "react-icons/fi";
+import { Table, Button } from "antd";
+import { FiClock } from "react-icons/fi";
+
+interface OperatorData {
+  key: string;
+  dateJoined: string;
+  operatorName: string;
+  operatorEarning: string;
+  totalRequest: string;
+  totalRevenue: string;
+  tax: string;
+  ministryOfHealth: string;
+  govt: string;
+}
 
 const OperatorRevenue = () => {
-
-  const data = [
+  const data: OperatorData[] = [
     {
       key: "1",
       dateJoined: "12th Jan. 2025",
@@ -95,14 +106,14 @@ const OperatorRevenue = () => {
     },
   ];
 
-  // Table columns
+  // Table columns with proper types
   const columns = [
     {
       title: "Date Joined",
       dataIndex: "dateJoined",
       key: "dateJoined",
-      sorter: (a, b) => a.dateJoined.localeCompare(b.dateJoined),
-      render: (text) => (
+      sorter: (a: OperatorData, b: OperatorData) => a.dateJoined.localeCompare(b.dateJoined),
+      render: (text: string) => (
         <div className="flex items-center gap-2">
           <FiClock className="text-gray-400" />
           <span>{text}</span>
@@ -113,38 +124,62 @@ const OperatorRevenue = () => {
       title: "Operator Name",
       dataIndex: "operatorName",
       key: "operatorName",
-      sorter: (a, b) => a.operatorName.localeCompare(b.operatorName),
+      sorter: (a: OperatorData, b: OperatorData) => a.operatorName.localeCompare(b.operatorName),
     },
     {
       title: "Total Revenue",
       dataIndex: "totalRevenue",
-      key: "totalRevenue",      
+      key: "totalRevenue",
+      sorter: (a: OperatorData, b: OperatorData) => {
+        const aValue = parseFloat(a.totalRevenue.replace(/[₦,]/g, ''));
+        const bValue = parseFloat(b.totalRevenue.replace(/[₦,]/g, ''));
+        return aValue - bValue;
+      },
     },
     {
       title: "Operator Revenue",
       dataIndex: "operatorEarning",
-      key: "operatorEarning",      
+      key: "operatorEarning",
+      sorter: (a: OperatorData, b: OperatorData) => {
+        const aValue = parseFloat(a.operatorEarning.replace(/[₦,]/g, ''));
+        const bValue = parseFloat(b.operatorEarning.replace(/[₦,]/g, ''));
+        return aValue - bValue;
+      },
     },
     {
       title: "Tax",
       dataIndex: "tax",
-      key: "tax",      
+      key: "tax",
+      sorter: (a: OperatorData, b: OperatorData) => {
+        const aValue = parseFloat(a.tax.replace(/[₦,]/g, ''));
+        const bValue = parseFloat(b.tax.replace(/[₦,]/g, ''));
+        return aValue - bValue;
+      },
     },
     {
       title: "Ministry of Health",
       dataIndex: "ministryOfHealth",
-      key: "ministryOfHealth",      
+      key: "ministryOfHealth",
+      sorter: (a: OperatorData, b: OperatorData) => {
+        const aValue = parseFloat(a.ministryOfHealth.replace(/[₦,]/g, ''));
+        const bValue = parseFloat(b.ministryOfHealth.replace(/[₦,]/g, ''));
+        return aValue - bValue;
+      },
     },
     {
       title: "Govt",
       dataIndex: "govt",
-      key: "govt",      
+      key: "govt",
+      sorter: (a: OperatorData, b: OperatorData) => {
+        const aValue = parseFloat(a.govt.replace(/[₦,]/g, ''));
+        const bValue = parseFloat(b.govt.replace(/[₦,]/g, ''));
+        return aValue - bValue;
+      },
     },
   ];
 
   return (
     <>
-      <p className="mb-4">Manage incoming requests for customer emergency booking</p>
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         {/* Header with Filter and Add New */}
         <div className="p-6 py-4 border-b border-gray-200">

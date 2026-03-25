@@ -1,6 +1,12 @@
 import { FiFileText } from "react-icons/fi";
 
-const InvoiceCard = () => {
+
+interface InvoiceCardProps {
+  booking: any;
+}
+
+const InvoiceCard: React.FC<InvoiceCardProps> = ({ booking }) => {
+  console.log("Booking data in InvoiceCard:", booking);
   return (
     <div className="w-full max-w-sm bg-white rounded-2xl shadow-sm overflow-hidden mt-3">
       {/* Header */}

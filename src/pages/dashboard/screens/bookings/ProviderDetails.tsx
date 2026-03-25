@@ -8,8 +8,6 @@ import {
   FiChevronUp,
   FiCheckCircle,
   FiUserCheck,
-  FiMapPin,
-  FiMail
 } from "react-icons/fi";
 import { FaEnvelope, FaPen } from "react-icons/fa";
 import { Button, Spin, Modal, Select, Input } from "antd";
@@ -98,13 +96,11 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ booking }) => {
     mutate(`/bookings/${booking?.booking_id}`);
     mutate('/bookings');
     
-    // If we have a providerId, refresh that provider data
     if (providerId) {
       mutateProvider();
     }
   };
 
-  // Use real data from provider if available, otherwise fallback to booking data
   const providerDetails = {
     providerName: provider?.name || "Not Assigned",
     contact: provider?.phone_number || "N/A",

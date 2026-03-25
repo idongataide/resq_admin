@@ -8,7 +8,7 @@ import {
   DeleteOutlined,
   UploadOutlined,
 } from "@ant-design/icons";
-import { FiClock, FiDollarSign } from "react-icons/fi";
+import { FiClock } from "react-icons/fi";
 import AddFeeModal from "./AddFeeModal";
 import EditFeeModal from "./EditFeeModal";
 import DeleteFeeModal from "./DeleteFee";
@@ -16,15 +16,14 @@ import { useFees } from "@/hooks/useSettings";
 
 
 
-interface Fee {
-  id?: string;
-  key?: string;
+export interface Fee {
+  fee_id: string;
   name: string;
-  amount: string | number;
-  lastModified?: string;
-  createdAt?: string;
+  amount: number;
   updatedAt?: string;
+  createdAt?: string;
 }
+
 const GeneralCostPointsTable = () => {
   const [searchText, setSearchText] = useState("");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);

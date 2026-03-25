@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Modal, Input, Button, Switch, Form } from "antd";
 import { FiX } from "react-icons/fi";
 import Images from "@/components/images";

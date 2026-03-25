@@ -7,8 +7,6 @@ import {
   UploadOutlined,
   CheckOutlined,
   CloseOutlined,
-  PlayCircleOutlined,
-  PauseCircleOutlined,
 } from "@ant-design/icons";
 import { FiClock } from "react-icons/fi";
 import Images from "@/components/images";
