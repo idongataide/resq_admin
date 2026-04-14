@@ -10,12 +10,14 @@ import { login } from "@/api/authAPI";
 import { ResponseValue } from "@/interfaces/enums";
 import toast, { Toaster } from "react-hot-toast";
 import { useOnboardingStore } from "@/global/store";
+import { setNavData } from "../common/setNavData";
 
     const Login = () => {
     const { setNavPath } = useOnboardingStore();
     const navigate = useNavigate();
-    const { setEmail } = useOnboardingStore()
+    // const { setEmail } = useOnboardingStore()
     const [loading, setLoading] = React.useState(false);
+    const navPath = useOnboardingStore();
 
     const onFinish = (values: any) => {
     setLoading(true);
@@ -35,15 +37,25 @@ import { useOnboardingStore } from "@/global/store";
         if (res.status === ResponseValue.SUCCESS) {
         toast.success("Login Successful");
 
-        setEmail(values.email);
+        setNavData(navPath, values.email, res);                               
+        // toast.success('OTP verified successfully!');
+        localStorage.setItem(
+            "adminToken",
+            JSON.stringify({
+            access: res?.data?.token,
+            })
+        );
+        navigate('/home');
+
+        // setEmail(values.email);
         // localStorage.setItem(
         //     "adminToken",
         //     JSON.stringify({
         //     access: res?.data?.token,
         //     })
         // );
-        navigate("/login/enter-otp");
-        setNavPath("enter-otp");
+        // navigate("/login/enter-otp");
+        // setNavPath("enter-otp");
         } else {
         const x = res?.response?.data?.msg;
         toast.error(x);
