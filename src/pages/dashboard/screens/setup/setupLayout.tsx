@@ -40,7 +40,7 @@ const SetupLayout: React.FC = () => {
       <div className="w-full p-6">
         {/* Page Title */}
         <div className="mb-4">
-          <h1 className="text-2xl font-semibold text-[#000A0F]">{pageTitle}</h1>
+          <h1 className="text-md font-semibold text-[#000A0F]">{pageTitle}</h1>
         </div>
      
         {/* Tabs */}

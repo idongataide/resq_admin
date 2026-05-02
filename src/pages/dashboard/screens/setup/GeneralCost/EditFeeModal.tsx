@@ -42,7 +42,7 @@ const EditFeeModal: React.FC<EditFeeModalProps> = ({
   const [form] = Form.useForm<FormValues>();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { mutate: globalMutate } = useSWRConfig();
-  const { type, isNonEmergency } = useSettingsType();
+  const { isNonEmergency } = useSettingsType();
 
   useEffect(() => {
     if (fee && open) {

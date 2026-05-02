@@ -89,7 +89,7 @@ const SiderScreen: React.FC = () => {
     }));
   };
 
-  const renderMenuItem = (item: any, index: number, isChild = false) => {
+  const renderMenuItem = (item: any, _index: number, isChild = false) => {
     const hasChildren = item.children && item.children.length > 0;
     const isExpanded = expandedMenus[item.id];
     const isActive = pathname === `/${item.URL}` || (item.URL !== 'setup' && pathname.startsWith(`/${item.URL}`));
