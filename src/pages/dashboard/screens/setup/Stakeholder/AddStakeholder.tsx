@@ -36,7 +36,7 @@ const AddStakeholderModal: React.FC<AddStakeholderModalProps> = ({
   
   const { data: bankList, isLoading: isLoadingBanks } = useBanksList();
   const { mutate: globalMutate } = useSWRConfig();
-  const { type, isNonEmergency } = useSettingsType();
+  const { isNonEmergency } = useSettingsType();
 
   // Reset form when modal closes
   useEffect(() => {
