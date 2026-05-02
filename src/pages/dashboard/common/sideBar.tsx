@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useOnboardingStore } from "../../../global/store";
 import { AiOutlineLogout } from "react-icons/ai";
 import Images from "../../../components/images";
+import { FaAngleDown, FaAngleRight } from "react-icons/fa";
 
 const SiderScreen: React.FC = () => {
   const navigate = useNavigate();
@@ -52,6 +53,18 @@ const SiderScreen: React.FC = () => {
       title: "setup",
       URL: "setup",
       icon: Images.icon?.setup,
+      children: [
+        {
+          id: 71,
+          title: "Emergency",
+          URL: "setup/emergency",
+        },
+        {
+          id: 72,
+          title: "Non-emergency",
+          URL: "setup/non-emergency",
+        },
+      ],
     },
     {
       id: 8,
@@ -67,9 +80,63 @@ const SiderScreen: React.FC = () => {
     },
   ];
 
-  const handleStart = pathname.split("/")[1] === "" ? true : false;
-  
-  const [timeChange, setTimeChange] = useState<boolean>(false);
+  const [expandedMenus, setExpandedMenus] = useState<{ [key: number]: boolean }>({});
+
+  const toggleExpanded = (id: number) => {
+    setExpandedMenus(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
+
+  const renderMenuItem = (item: any, index: number, isChild = false) => {
+    const hasChildren = item.children && item.children.length > 0;
+    const isExpanded = expandedMenus[item.id];
+    const isActive = pathname === `/${item.URL}` || (item.URL !== 'setup' && pathname.startsWith(`/${item.URL}`));
+
+    return (
+      <div key={item.id}>
+        <div
+          className={`
+            flex items-center font-[400] transition-all duration-300 py-3 my-2 overflow-hidden capitalize cursor-pointer
+            ${siderBarView ? "px-2 mx-4 transition-all duration-500" : "rounded-full w-10 h-10 flex justify-center items-center pl-2"}
+            ${isChild ? "ml-6" : ""}
+            ${
+              isActive
+                ? "text-[#FF6C2D] bg-[#FFF0E8] border-l-[5px]! border-[#DB4A47]"
+                : "hover:bg-[#FFF0E8] text-[#7D8489] hover:text-[#7D8489]"
+            }
+          `}
+          onClick={() => hasChildren ? toggleExpanded(item.id) : navigate(`/${item.URL}`)}
+        >
+          {!isChild && (
+            <div className="h-[20px] relative">
+              <img
+                src={item?.icon}
+                className={`h-[20px] ${
+                  isActive
+                    ? "[filter:invert(47%)_sepia(86%)_saturate(1894%)_hue-rotate(1deg)_brightness(101%)_contrast(101%)]"
+                    : "[filter:invert(50%)_sepia(9%)_saturate(383%)_hue-rotate(182deg)_brightness(94%)_contrast(86%)]"
+                }`}
+              />
+            </div>
+          )}
+          <span className="ml-2 text-[#4A4A4A]">{siderBarView && item.title}</span>
+          {hasChildren && siderBarView && (
+            <span className="ml-auto mr-2">{isExpanded ? <FaAngleDown /> : <FaAngleRight />}</span>
+          )}
+        </div>
+        {hasChildren && isExpanded && siderBarView && (
+          <div>
+            {item.children.map((child: any, childIndex: number) => renderMenuItem(child, childIndex, true))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const [timeChange, setTimeChange] = useState(siderBarView);
+  // const [handleStart, setHandleStart] = useState(true);
 
   useEffect(() => {
     const speedHandling = siderBarView ? 300 : 160;
@@ -121,38 +188,7 @@ const SiderScreen: React.FC = () => {
         <div
           className={`mt-10 ${!siderBarView && "flex flex-col items-center siderBarView"}`}
         >
-          {navData.map((item, index) => (
-            <NavLink
-              to={`/${item?.URL}`}
-              key={item.id}
-              children={({ isActive }) => (
-                <div
-                  className={`
-                    ${index === 0 && handleStart ? "text-[#FF6C2D] bg-[#FDF6F6]" : ""}
-                    flex items-center font-[400] transition-all duration-300 py-3 my-2 overflow-hidden capitalize 
-                    ${siderBarView ? `${timeChange && "px-2 mx-4 transition-all duration-500"}` : "rounded-full w-10 h-10 flex justify-center items-center pl-2"}
-                    ${
-                      isActive
-                        ? "text-[#FF6C2D] bg-[#FFF0E8] border-l-[5px]! border-[#DB4A47]"
-                        : "hover:bg-[#FFF0E8] text-[#7D8489] hover:text-[#7D8489]"
-                    }
-                  `}
-                >
-                  <div className="h-[20px] relative">
-                    <img
-                      src={item?.icon}
-                      className={`h-[20px] ${
-                        isActive
-                          ? "[filter:invert(47%)_sepia(86%)_saturate(1894%)_hue-rotate(1deg)_brightness(101%)_contrast(101%)]"
-                          : "[filter:invert(50%)_sepia(9%)_saturate(383%)_hue-rotate(182deg)_brightness(94%)_contrast(86%)]"
-                      }`}
-                    />
-                  </div>
-                  <span className="ml-2 text-[#4A4A4A]">{siderBarView && item.title}</span>
-                </div>
-              )}
-            />
-          ))}
+          {navData.map((item, index) => renderMenuItem(item, index))}
         </div>
       </div>
 

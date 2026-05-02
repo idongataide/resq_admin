@@ -2,10 +2,11 @@ import useSWR from "swr";
 import { getBookings, getBookingCounts, getBookingById } from  "@/api/bookingsApi";
 
 
-export const useBookings = () => {
+export const useBookings = (booking_type?: string) => {
+  const swrKey = booking_type ? `/bookings?booking_type=${booking_type}` : "/bookings";
   const { data, isLoading, mutate } = useSWR(
-    "/bookings",
-    () => getBookings(),
+    swrKey,
+    () => getBookings(booking_type),
     {
       revalidateOnFocus: false,
     }

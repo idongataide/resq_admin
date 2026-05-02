@@ -149,8 +149,24 @@ export const routes = createBrowserRouter([
         ),
       },
 
-      {
+     {
         path: "/setup",
+        element: (
+          <Suspense fallback={<LoadingScreen />}>
+            <SetupLayout />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/setup/emergency",
+        element: (
+          <Suspense fallback={<LoadingScreen />}>
+            <SetupLayout />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/setup/non-emergency",
         element: (
           <Suspense fallback={<LoadingScreen />}>
             <SetupLayout />

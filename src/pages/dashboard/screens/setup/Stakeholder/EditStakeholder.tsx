@@ -1,3 +1,4 @@
+// EditStakeholderModal.tsx (or UpdateStakeholderModal.tsx)
 import React, { useState, useEffect } from "react";
 import { Modal, Input, Button, Form, Select } from "antd";
 import { FiX } from "react-icons/fi";
@@ -6,7 +7,8 @@ import { useSWRConfig } from "swr";
 import { verifyAccount } from "@/api/banks";
 import { DefaultOptionType } from "antd/es/select";
 import { useBanksList } from "@/hooks/useSettings";
-import { updateStakeholder } from "@/api/settingsApi";
+import { updateStakeholder, updateNonEmergencyStakeholder } from "@/api/settingsApi";
+import { useSettingsType } from "@/hooks/useSettingsType";
 
 const { Option } = Select;
 
@@ -36,6 +38,7 @@ const UpdateStakeholderModal: React.FC<UpdateStakeholderModalProps> = ({
   
   const { data: bankList, isLoading: isLoadingBanks } = useBanksList();
   const { mutate: globalMutate } = useSWRConfig();
+  const { isNonEmergency } = useSettingsType();
 
   // Set form values when stakeholder data changes
   useEffect(() => {
@@ -57,7 +60,7 @@ const UpdateStakeholderModal: React.FC<UpdateStakeholderModalProps> = ({
         bank_code: bankData.bank_code,
         account_number: bankData.account_number,
         account_name: bankData.account_name,
-        amount: stakeholder.amount, // This is already a number from API
+        amount: stakeholder.amount?.toString(),
         amount_type: stakeholder.amount_type || 'percentage',
       });
     }
@@ -128,7 +131,9 @@ const UpdateStakeholderModal: React.FC<UpdateStakeholderModalProps> = ({
     }
 
     setIsSubmitting(true);
-    const loadingToast = toast.loading("Updating stakeholder...");
+    const loadingToast = toast.loading(
+      isNonEmergency ? "Updating non-emergency stakeholder..." : "Updating stakeholder..."
+    );
 
     // Convert amount to number if it's a string
     const amount = typeof values.amount === 'string' 
@@ -141,18 +146,33 @@ const UpdateStakeholderModal: React.FC<UpdateStakeholderModalProps> = ({
       bank_code: values.bank_code,
       account_number: values.account_number,
       account_name: values.account_name,
-      amount: amount, // Ensure it's a number
+      amount: amount?.toString(), // Ensure amount is sent as string
       amount_type: values.amount_type,
     };
 
     console.log("Submitting payload:", payload); // Debug log
 
     try {
-      const response = await updateStakeholder(stakeholder.stakeholder_id, payload);
+      let response;
+      
+      if (isNonEmergency) {
+        response = await updateNonEmergencyStakeholder(stakeholder.stakeholder_id, payload);
+      } else {
+        response = await updateStakeholder(stakeholder.stakeholder_id, payload);
+      }
 
       if (response.status === 'ok') {
-        toast.success('Stakeholder updated successfully', { id: loadingToast });
-        globalMutate('/settings/stakeholders');
+        toast.success(
+          isNonEmergency ? 'Non-emergency stakeholder updated successfully' : 'Stakeholder updated successfully',
+          { id: loadingToast }
+        );
+        
+        // Trigger mutations to refresh data based on type
+        if (isNonEmergency) {
+          globalMutate('/admins/settings/non-emergency-stakeholders');
+        } else {
+          globalMutate('/settings/stakeholders');
+        }
         
         form.resetFields();
         setAccountName("");
@@ -172,6 +192,9 @@ const UpdateStakeholderModal: React.FC<UpdateStakeholderModalProps> = ({
     }
   };
 
+  // Dynamic title based on type
+  const modalTitle = isNonEmergency ? "Update Non-Emergency Stakeholder" : "Update Stakeholder";
+
   return (
     <Modal
       open={open}
@@ -185,7 +208,7 @@ const UpdateStakeholderModal: React.FC<UpdateStakeholderModalProps> = ({
       {/* Header */}
       <div className="bg-[#F3F5F9] px-4 py-6">
         <h2 className="text-xl font-semibold text-[#000A0F]">
-          Update Stakeholder
+          {modalTitle}
         </h2>
       </div>
 

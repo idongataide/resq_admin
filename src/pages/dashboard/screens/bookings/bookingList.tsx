@@ -41,7 +41,11 @@ interface Booking {
   final_cost?: number;
 }
 
-const BookingList = () => {
+interface BookingListProps {
+  bookingType?: string;
+}
+
+const BookingList: React.FC<BookingListProps> = ({ bookingType }) => {
   const navigate = useNavigate();
   const [searchText, setSearchText] = useState("");
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
@@ -51,7 +55,7 @@ const BookingList = () => {
   const [selectedHospital, setSelectedHospital] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const { data: bookings, isLoading, mutate } = useBookings();
+  const { data: bookings, isLoading, mutate } = useBookings(bookingType);
   const { data: hospitals } = useHospitals();
 
   // Format date

@@ -1,13 +1,16 @@
+// DeleteFee.tsx
 import React, { useState } from "react";
 import { Modal, Button } from "antd";
 import { FiX } from "react-icons/fi";
 import toast from "react-hot-toast";
-import { deleteFee } from "@/api/settingsApi";
+import { deleteFee, deleteNonEmergencyFee } from "@/api/settingsApi";
 import { useSWRConfig } from "swr";
 import Images from "@/components/images";
+import { useSettingsType } from "@/hooks/useSettingsType";
 
 interface Fee {
   fee_id: string;
+  name?: string;
   // Add other properties if needed
 }
 
@@ -26,6 +29,7 @@ const DeleteFeeModal: React.FC<DeleteFeeModalProps> = ({
 }) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const { mutate: globalMutate } = useSWRConfig();
+  const { isNonEmergency } = useSettingsType();
 
   const handleDelete = async () => {
     if (!fee?.fee_id) {
@@ -34,20 +38,35 @@ const DeleteFeeModal: React.FC<DeleteFeeModalProps> = ({
     }
     
     setIsDeleting(true);
-    const loadingToast = toast.loading('Deleting cost point...');
+    const loadingToast = toast.loading(
+      isNonEmergency ? 'Deleting non-emergency cost point...' : 'Deleting cost point...'
+    );
 
     try {
-      const response = await deleteFee(fee.fee_id);
+      let response;
+      
+      if (isNonEmergency) {
+        response = await deleteNonEmergencyFee(fee.fee_id);
+      } else {
+        response = await deleteFee(fee.fee_id);
+      }
       
       // Check if response is an error
       if (response?.response?.data?.msg || response?.message) {
         const errorMsg = response?.response?.data?.msg || response?.message || 'Failed to delete cost point';
         toast.error(errorMsg, { id: loadingToast });
       } else if (response?.status === 'ok' || response?.success) {
-        toast.success('Cost point deleted successfully!', { id: loadingToast });
+        toast.success(
+          isNonEmergency ? 'Non-emergency cost point deleted successfully!' : 'Cost point deleted successfully!',
+          { id: loadingToast }
+        );
         
-        // Trigger mutations to refresh data
-        globalMutate('/settings/fees');
+        // Trigger mutations to refresh data based on type
+        if (isNonEmergency) {
+          globalMutate('/admins/settings/non-emergency-fees');
+        } else {
+          globalMutate('/settings/fees');
+        }
         
         // Call success callback
         onSuccess?.();
@@ -56,8 +75,15 @@ const DeleteFeeModal: React.FC<DeleteFeeModalProps> = ({
         onClose();
       } else {
         // Assume success if we got here without error
-        toast.success('Cost point deleted successfully!', { id: loadingToast });
-        globalMutate('/settings/fees');
+        toast.success(
+          isNonEmergency ? 'Non-emergency cost point deleted successfully!' : 'Cost point deleted successfully!',
+          { id: loadingToast }
+        );
+        if (isNonEmergency) {
+          globalMutate('/admins/settings/non-emergency-fees');
+        } else {
+          globalMutate('/settings/fees');
+        }
         onSuccess?.();
         onClose();
       }
@@ -68,6 +94,12 @@ const DeleteFeeModal: React.FC<DeleteFeeModalProps> = ({
       setIsDeleting(false);
     }
   };
+
+  // Dynamic title and content based on type
+  const modalTitle = isNonEmergency ? "Delete Non-Emergency Cost Point" : "Delete Cost Point";
+  const confirmationText = isNonEmergency 
+    ? "This action would remove this non-emergency cost point from the platform and is irreversible"
+    : "This action would remove this cost point from the platform and is irreversible";
 
   return (
     <Modal
@@ -80,16 +112,15 @@ const DeleteFeeModal: React.FC<DeleteFeeModalProps> = ({
     >
       <div className="text-left! p-6">
         <div className="flex justify-left! mb-4">
-         <img src={Images.icon.question} alt=""/>
+          <img src={Images.icon.question} alt=""/>
         </div>
         
         <h3 className="text-xl font-semibold text-[#001417] mb-2">
-          Delete Cost Point
+          {modalTitle}
         </h3>
-       
         
         <p className="text-sm text-[#354959] mb-8">
-          This action would remove this cost point from the platform and is irrversible
+          {confirmationText}
         </p>
 
         <div className="flex justify-center gap-4">

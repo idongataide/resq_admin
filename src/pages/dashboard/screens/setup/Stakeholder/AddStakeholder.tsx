@@ -1,3 +1,4 @@
+// components/settings/AddStakeholderModal.tsx
 import React, { useState, useEffect } from "react";
 import { Modal, Input, Button, Form, Select } from "antd";
 import { FiX } from "react-icons/fi";
@@ -6,7 +7,8 @@ import { useSWRConfig } from "swr";
 import { verifyAccount } from "@/api/banks";
 import { DefaultOptionType } from "antd/es/select";
 import { useBanksList } from "@/hooks/useSettings";
-import { addStakeholder } from "@/api/settingsApi";
+import { addStakeholder, addNonEmergencyStakeholder } from "@/api/settingsApi";
+import { useSettingsType } from "@/hooks/useSettingsType";
 
 const { Option } = Select;
 
@@ -34,6 +36,7 @@ const AddStakeholderModal: React.FC<AddStakeholderModalProps> = ({
   
   const { data: bankList, isLoading: isLoadingBanks } = useBanksList();
   const { mutate: globalMutate } = useSWRConfig();
+  const { type, isNonEmergency } = useSettingsType();
 
   // Reset form when modal closes
   useEffect(() => {
@@ -91,7 +94,9 @@ const AddStakeholderModal: React.FC<AddStakeholderModalProps> = ({
 
   const handleSubmit = async (values: any) => {
     setIsSubmitting(true);
-    const loadingToast = toast.loading("Adding stakeholder...");
+    const loadingToast = toast.loading(
+      isNonEmergency ? "Adding non-emergency stakeholder..." : "Adding stakeholder..."
+    );
 
     const payload = {
       name: values.name,
@@ -104,11 +109,25 @@ const AddStakeholderModal: React.FC<AddStakeholderModalProps> = ({
     };
 
     try {
-      const response = await addStakeholder(payload);
+      let response;
+      
+      if (isNonEmergency) {
+        response = await addNonEmergencyStakeholder(payload);
+      } else {
+        response = await addStakeholder(payload);
+      }
 
       if (response.status === 'ok') {
-        toast.success('Stakeholder added successfully', { id: loadingToast });
-        globalMutate('/settings/stakeholders');
+        toast.success(
+          isNonEmergency ? 'Non-emergency stakeholder added successfully' : 'Stakeholder added successfully',
+          { id: loadingToast }
+        );
+        
+        if (isNonEmergency) {
+          globalMutate('/admins/settings/non-emergency-stakeholders');
+        } else {
+          globalMutate('/settings/stakeholders');
+        }
         
         form.resetFields();
         setAccountName("");
@@ -141,7 +160,7 @@ const AddStakeholderModal: React.FC<AddStakeholderModalProps> = ({
       {/* Header */}
       <div className="bg-[#F3F5F9] px-4 py-6">
         <h2 className="text-xl font-semibold text-[#000A0F]">
-          Add New Stakeholder
+          {isNonEmergency ? "Add New Non-Emergency Stakeholder" : "Add New Stakeholder"}
         </h2>
       </div>
 

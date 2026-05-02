@@ -1,10 +1,11 @@
 import { axiosAPIInstance } from "./interceptor";
 
 // Get all bookings
-export const getBookings = async () => {
+export const getBookings = async (booking_type?: string) => {
   try {
+    const query = booking_type ? `?booking_type=${booking_type}` : "";
     return await axiosAPIInstance
-      .get(`/bookings`)
+      .get(`/bookings${query}`)
       .then((res) => {
         return res?.data;
       });

@@ -1,9 +1,11 @@
+// components/settings/AddFeeModal.tsx
 import React, { useState } from "react";
-import { Modal, Form, Input, Button } from "antd";
+import { Modal, Form, Input, Button, Select } from "antd";
 import { FiX } from "react-icons/fi";
 import toast from "react-hot-toast";
-import { addFees } from "@/api/settingsApi";
+import { addFees, addNonEmergencyFee } from "@/api/settingsApi";
 import { useSWRConfig } from "swr";
+import { useSettingsType } from "@/hooks/useSettingsType";
 
 interface AddFeeModalProps {
   open: boolean;
@@ -14,6 +16,7 @@ interface AddFeeModalProps {
 interface FormValues {
   cost_name: string;
   amount: number;
+  type: "percentage" | "fixed";
 }
 
 const AddFeeModal: React.FC<AddFeeModalProps> = ({
@@ -24,26 +27,49 @@ const AddFeeModal: React.FC<AddFeeModalProps> = ({
   const [form] = Form.useForm<FormValues>();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { mutate: globalMutate } = useSWRConfig();
+  const {  isNonEmergency } = useSettingsType();
 
   const handleSubmit = async (values: FormValues) => {
     setIsSubmitting(true);
-    const loadingToast = toast.loading('Adding cost point...');
+    const loadingToast = toast.loading(
+      isNonEmergency ? 'Adding non-emergency cost point...' : 'Adding cost point...'
+    );
 
     try {
-      const response = await addFees({
-        name: values.cost_name,
-        amount: values.amount,
-      });
+      let response;
+      
+      if (isNonEmergency) {
+        // Use non-emergency API
+        response = await addNonEmergencyFee({
+          name: values.cost_name,
+          amount: values.amount,
+          amount_type: values.type,
+        });
+      } else {
+        // Use emergency API
+        response = await addFees({
+          name: values.cost_name,
+          amount: values.amount,
+          type: values.type,
+        });
+      }
       
       // Check if response is an error
       if (response?.response?.data?.msg || response?.message) {
         const errorMsg = response?.response?.data?.msg || response?.message || 'Failed to add cost point';
         toast.error(errorMsg, { id: loadingToast });
       } else if (response?.status === 'ok' || response?.success || response?.id) {
-        toast.success('Cost point added successfully!', { id: loadingToast });
+        toast.success(
+          isNonEmergency ? 'Non-emergency cost point added successfully!' : 'Cost point added successfully!',
+          { id: loadingToast }
+        );
         
-        // Trigger mutations to refresh data
-        globalMutate('/settings/fees');
+        // Trigger mutations to refresh data based on type
+        if (isNonEmergency) {
+          globalMutate('/admins/settings/non-emergency-fees');
+        } else {
+          globalMutate('/settings/fees');
+        }
         
         // Call success callback
         onSuccess?.();
@@ -53,8 +79,15 @@ const AddFeeModal: React.FC<AddFeeModalProps> = ({
         onClose();
       } else {
         // Assume success if we got here without error
-        toast.success('Cost point added successfully!', { id: loadingToast });
-        globalMutate('/settings/fees');
+        toast.success(
+          isNonEmergency ? 'Non-emergency cost point added successfully!' : 'Cost point added successfully!',
+          { id: loadingToast }
+        );
+        if (isNonEmergency) {
+          globalMutate('/admins/settings/non-emergency-fees');
+        } else {
+          globalMutate('/settings/fees');
+        }
         onSuccess?.();
         form.resetFields();
         onClose();
@@ -72,6 +105,9 @@ const AddFeeModal: React.FC<AddFeeModalProps> = ({
     onClose();
   };
 
+  // Watch the type field to conditionally change the amount label and placeholder
+  const selectedType = Form.useWatch('type', form);
+
   return (
     <Modal
       open={open}
@@ -84,7 +120,7 @@ const AddFeeModal: React.FC<AddFeeModalProps> = ({
       {/* Header */}
       <div className="bg-[#F3F5F9] px-4 py-6">
         <h2 className="text-xl font-semibold text-[#000A0F]">
-          Add New Cost Point
+          {isNonEmergency ? "Add New Non-Emergency Cost Point" : "Add New Cost Point"}
         </h2>
       </div>
 
@@ -94,7 +130,7 @@ const AddFeeModal: React.FC<AddFeeModalProps> = ({
           form={form}
           layout="vertical"
           onFinish={handleSubmit}
-          initialValues={{ cost_name: '', amount: undefined }}
+          initialValues={{ cost_name: '', amount: undefined, type: 'fixed' }}
         >
           {/* Cost Name */}
           <Form.Item
@@ -113,32 +149,53 @@ const AddFeeModal: React.FC<AddFeeModalProps> = ({
             />
           </Form.Item>
 
+          {/* Type Selection */}
+          <Form.Item
+            name="type"
+            label="Cost Type"
+            rules={[{ required: true, message: 'Please select cost type' }]}
+          >
+            <Select
+              size="large"
+              className="rounded-lg!"
+              placeholder="Select type"
+              options={[
+                { label: 'Percentage (%)', value: 'percentage' },
+                { label: 'Fixed Amount', value: 'fixed' }
+              ]}
+            />
+          </Form.Item>
+
           {/* Amount */}
           <Form.Item
             name="amount"
-            label="Amount"
+            label={selectedType === 'percentage' ? 'Percentage' : 'Amount'}
             rules={[
-              { required: true, message: 'Please enter amount' },
+              { required: true, message: `Please enter ${selectedType === 'percentage' ? 'percentage' : 'amount'}` },
               {
                 validator: (_, value) => {
-                  if (!value) return Promise.reject(new Error('Amount is required'));
+                  if (!value) return Promise.reject(new Error(`${selectedType === 'percentage' ? 'Percentage' : 'Amount'} is required`));
                   const num = parseFloat(value);
                   if (isNaN(num) || num <= 0) {
-                    return Promise.reject(new Error('Please enter a valid amount greater than 0'));
+                    return Promise.reject(new Error(`Please enter a valid ${selectedType === 'percentage' ? 'percentage' : 'amount'} greater than 0`));
+                  }
+                  if (selectedType === 'percentage' && (num < 0 || num > 100)) {
+                    return Promise.reject(new Error('Percentage must be between 0 and 100'));
                   }
                   return Promise.resolve();
                 }
               }
             ]}
+            extra={selectedType === 'percentage' ? 'Value between 0 and 100' : 'Enter the fixed amount'}
           >
             <Input
               size="large"
               className="rounded-lg!"
-              placeholder="Enter amount"
-              prefix="#"
+              placeholder={selectedType === 'percentage' ? "Enter percentage" : "Enter amount"}
+              prefix={selectedType === 'percentage' ? "%" : "#"}
               type="number"
               min="0"
-              step="0.01"
+              step={selectedType === 'percentage' ? "1" : "0.01"}
             />
           </Form.Item>
 

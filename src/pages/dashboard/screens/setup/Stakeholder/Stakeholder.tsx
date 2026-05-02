@@ -1,5 +1,7 @@
+// Stakeholder/Stakeholder.tsx
 import React, { useState, useMemo } from "react";
 import { Table, Button, Input } from "antd";
+import type { ColumnsType } from "antd/es/table";
 import { 
   SearchOutlined, 
   FilterOutlined, 
@@ -12,6 +14,7 @@ import AddStakeholderModal from "./AddStakeholder";
 import UpdateStakeholderModal from "./EditStakeholder";
 import DeleteStakeholderModal from "./DeleteStakeHolder";
 import { useStakeholders } from "@/hooks/useSettings";
+import { useNonEmergencyStakeholders } from "@/hooks/useSettings";
 
 // Updated interface to match API response
 interface Stakeholder {
@@ -43,14 +46,31 @@ interface StakeholderDisplay {
   createdAt: string;
 }
 
-const StakeholderDisbursementTable = () => {
+interface StakeholderDisbursementTableProps {
+  isNonEmergency?: boolean;
+}
+
+const StakeholderDisbursementTable = ({ isNonEmergency = false }: StakeholderDisbursementTableProps) => {
   const [searchText, setSearchText] = useState("");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedStakeholder, setSelectedStakeholder] = useState<Stakeholder | null>(null);
   
-  const { data: stakeholders, isLoading, mutate } = useStakeholders();
+  // Use appropriate hook based on type
+  const { data: emergencyStakeholders, isLoading: emergencyLoading, mutate: emergencyMutate } = useStakeholders();
+  const { data: nonEmergencyStakeholders, isLoading: nonEmergencyLoading, mutate: nonEmergencyMutate } = useNonEmergencyStakeholders();
+  
+  const stakeholders = isNonEmergency ? nonEmergencyStakeholders : emergencyStakeholders;
+  const isLoading = isNonEmergency ? nonEmergencyLoading : emergencyLoading;
+  
+  const mutate = () => {
+    if (isNonEmergency) {
+      nonEmergencyMutate();
+    } else {
+      emergencyMutate();
+    }
+  };
 
   // Transform API data to flattened structure for table display
   const transformedData: StakeholderDisplay[] = useMemo(() => {
@@ -128,8 +148,17 @@ const StakeholderDisbursementTable = () => {
     }));
   }, [transformedData]);
 
+  // Dynamic title and description
+  const pageDescription = isNonEmergency 
+    ? "Manage stakeholder disbursement for non-emergency bookings"
+    : "Manage incoming requests for customer emergency booking";
+  
+  const pageTitle = isNonEmergency 
+    ? "NON-EMERGENCY STAKEHOLDERS DISBURSEMENT"
+    : "STAKEHOLDERS DISBURSEMENT";
+
   // Table columns
-  const columns = [
+  const columns: ColumnsType<StakeholderDisplay> = [
     {
       title: "Name",
       dataIndex: "name",
@@ -153,6 +182,7 @@ const StakeholderDisbursementTable = () => {
       dataIndex: "bank_name",
       key: "bank_name",
       filters: bankFilters,
+      onFilter: (value: boolean | React.Key, record: StakeholderDisplay) => record.bank_name === value,
     },
     {
       title: "Value",
@@ -190,25 +220,25 @@ const StakeholderDisbursementTable = () => {
 
   return (
     <>
-      <p className="mb-4">Manage incoming requests for customer emergency booking</p>
+      <p className="mb-4">{pageDescription}</p>
 
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         {/* Header with Filter and Add New */}
         <div className="p-6 py-4 border-b border-gray-200">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <h1 className="text-[#354959] uppercase text-md font-bold">
-              STAKEHOLDERS DISBURSEMENT ({stakeholders?.length || 0})
+              {pageTitle} ({stakeholders?.length || 0})
             </h1>
             <div className="gap-3 flex">
-               <Input
-                    placeholder="Type here to search"
-                    prefix={<SearchOutlined className="text-gray-400" />}
-                    value={searchText}
-                    onChange={(e) => setSearchText(e.target.value)}
-                    className="w-64 rounded-lg"
-                    size="large"
-                    allowClear
-                />
+              <Input
+                placeholder="Type here to search"
+                prefix={<SearchOutlined className="text-gray-400" />}
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                className="w-64 rounded-lg"
+                size="large"
+                allowClear
+              />
               <Button 
                 icon={<UploadOutlined />} 
                 className="rounded-lg flex bg-[#FDF6F6]! text-[#DB4A47]! border-0! items-center"
@@ -260,7 +290,7 @@ const StakeholderDisbursementTable = () => {
         </div>
       </div>
 
-      {/* Add Stakeholder Modal */}
+      {/* Modals - These will auto-detect the route */}
       <AddStakeholderModal
         open={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
@@ -270,7 +300,6 @@ const StakeholderDisbursementTable = () => {
         }}
       />
 
-      {/* Update Stakeholder Modal */}
       <UpdateStakeholderModal
         open={isEditModalOpen}
         onClose={() => {
@@ -285,7 +314,6 @@ const StakeholderDisbursementTable = () => {
         stakeholder={selectedStakeholder}
       />
 
-      {/* Delete Stakeholder Modal */}
       <DeleteStakeholderModal
         open={isDeleteModalOpen}
         onClose={() => {
