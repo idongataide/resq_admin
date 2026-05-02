@@ -78,6 +78,8 @@ const DashboardLayout: React.FC = () => {
       "/service-providers": "Service Providers",
       "/hospitals": "Hospitals",
       "/setup": "Setup",
+      "/setup/emmegency": "Setup",
+      "/setup/non-emergency": "Setup ",
       "/revenue": "Revenue",
       "/my-team": "My Team",
       "/activity-log": "Activity Log",
