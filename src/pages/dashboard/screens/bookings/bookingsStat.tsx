@@ -31,19 +31,18 @@ const BookingMetrics: React.FC = () => {
       value: counts?.total_completed?.toLocaleString() || '0',
       bgColor: '#F8FEF5'
     },
-    // Optional: Add cancelled if you want to display it
-    // {
-    //   id: 'cancelled',
-    //   title: 'Cancelled Bookings',
-    //   value: counts?.total_cancelled?.toLocaleString() || '0',
-    //   bgColor: '#FEE9E7'
-    // }
+  {
+      id: 'cancelled',
+      title: 'Cancelled Bookings',
+      value: counts?.total_cancelled?.toLocaleString() || '0',
+      bgColor: '#FEE9E7'
+    }
   ];
 
   return (
     <>
       <div className="w-full">
-        <div className="grid grid-cols-4 gap-4 mb-6 bg-[#FFFFFF] p-4 rounded-lg">
+        <div className="grid grid-cols-3 lg:grid-cols-5 gap-4 mb-6 bg-[#FFFFFF] p-4 rounded-lg">
           {bookingMetrics.map((metric) => (
             <div 
               key={metric.id} 
