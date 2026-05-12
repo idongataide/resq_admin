@@ -3,7 +3,9 @@ import { getBookings, getBookingCounts, getBookingById } from  "@/api/bookingsAp
 
 
 export const useBookings = (booking_type?: string) => {
-  const swrKey = booking_type ? `/bookings?booking_type=${booking_type}` : "/bookings";
+  const swrKey = booking_type === "non-emergency"
+    ? `/bookings/schedules`
+    : "/bookings";
   const { data, isLoading, mutate } = useSWR(
     swrKey,
     () => getBookings(booking_type),
@@ -35,10 +37,10 @@ export const useBookingCounts = () => {
   };
 };
 
-export const useBooking = (booking_id: string | undefined) => {
+export const useBooking = (booking_id: string | undefined, booking_type?: string) => {
   const { data, isLoading, mutate } = useSWR(
-    booking_id ? `/bookings/${booking_id}` : null,
-    () => booking_id ? getBookingById(booking_id) : null,
+    booking_id ? (booking_type === "non-emergency" ? `/bookings/schedules/${booking_id}` : `/bookings/${booking_id}`) : null,
+    () => booking_id ? getBookingById(booking_id, booking_type) : null,
     {
       revalidateOnFocus: false,
     }

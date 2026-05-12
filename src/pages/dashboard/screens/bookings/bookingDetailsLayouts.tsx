@@ -1,6 +1,6 @@
 // BookingDetailsLayouts.tsx
 import React from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { Spin } from "antd";
 import UserProfile from "./userProfile";
 import RequestDetails from "./requestDetails";
@@ -15,7 +15,11 @@ import { useBooking } from "@/hooks/useBookings";
 
 const BookingDetailsLayouts: React.FC = () => {
     const { booking_id } = useParams<{ booking_id: string }>();
-    const { booking, isLoading } = useBooking(booking_id);
+    const location = useLocation();
+    
+    const isNonEmergency = location.pathname.includes("/bookings/schedule/");
+    const bookingType = isNonEmergency ? "non-emergency" : undefined;
+    const { booking, isLoading } = useBooking(booking_id, bookingType);
 
     if (isLoading) {
         return (

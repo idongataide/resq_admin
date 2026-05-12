@@ -17,6 +17,7 @@ import PatientsDetails from "@/pages/dashboard/screens/patients/patientsDetails"
 import BookingLayouts from "@/pages/dashboard/screens/bookings/bookingLayouts";
 import BookingDetailsLayouts from "@/pages/dashboard/screens/bookings/bookingDetailsLayouts";
 import ActivityLog from "@/pages/dashboard/screens/activity-log/activityLog";
+import BookingList from "@/pages/dashboard/screens/bookings/bookingList";
 
 
 const DashboadScreen = lazy(() =>
@@ -54,31 +55,35 @@ export const routes = createBrowserRouter([
       },
       
       {
-        path: "/bookings",
-        element: (
-          <Suspense fallback={<LoadingScreen />}>
-            <Outlet />
-          </Suspense>
-        ),
-        children: [
-          {
-            index: true,
-            element: (
-              <Suspense fallback={<LoadingScreen />}>
-                <BookingLayouts />
-              </Suspense>
-            ),
-          },
-          {
-            path: ":booking_id",
-            element: (
-              <Suspense fallback={<LoadingScreen />}>
-                <BookingDetailsLayouts />
-              </Suspense>
-            ),
-          },
-        ]
-       },
+          path: "/bookings",
+          element: (
+            <Suspense fallback={<LoadingScreen />}>
+              <BookingLayouts />
+            </Suspense>
+          ),
+          children: [
+            {
+              index: true,
+              element: <BookingList />,
+            },
+            {
+              path: "emergency",
+              element: <BookingList />,
+            },
+            {
+              path: "schedule",
+              element: <BookingList bookingType="non-emergency" />,
+            },
+            {
+              path: "schedule/:booking_id",
+              element: <BookingDetailsLayouts />,
+            },
+            {
+              path: ":booking_id",
+              element: <BookingDetailsLayouts />,
+            },
+          ]
+        },
       {
         path: "/patients",
         element: (

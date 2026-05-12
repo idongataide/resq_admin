@@ -19,6 +19,7 @@ const { Option } = Select;
 
 interface Booking {
   booking_id: string;
+  schedule_id?: string;
   booking_ref: string;
   customer_data: {
     customer_name: string;
@@ -158,15 +159,24 @@ const BookingList: React.FC<BookingListProps> = ({ bookingType }) => {
     }
   };
 
+
   // Handle row click - navigate to booking details page
   const handleRowClick = (record: Booking) => {
-    navigate(`/bookings/${record.booking_id}`);
+    const id = record.schedule_id || record.booking_id;
+    const route = bookingType === "non-emergency" 
+      ? `/bookings/schedule/${id}` 
+      : `/bookings/${id}`;
+    navigate(route);
   };
 
   // Handle view details button click
   const handleViewDetails = (record: Booking, e: React.MouseEvent) => {
     e.stopPropagation();
-    navigate(`/bookings/${record.booking_id}`);
+    const id = record.schedule_id || record.booking_id;
+    const route = bookingType === "non-emergency" 
+      ? `/bookings/schedule/${id}` 
+      : `/bookings/${id}`;
+    navigate(route);
   };
 
   // Filter bookings based on search
