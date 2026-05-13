@@ -76,6 +76,11 @@ const AmbulanceLeads = () => {
       key: "email",
     },
     {
+      title: "Role",
+      dataIndex: "user_type",
+      key: "user_type",
+    },
+    {
       title: "Phone Number",
       dataIndex: "phone_number",
       key: "phone_number",
