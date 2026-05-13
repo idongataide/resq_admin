@@ -10,16 +10,10 @@ import {
   FiUserCheck,
 } from "react-icons/fi";
 import { FaEnvelope, FaPen } from "react-icons/fa";
-import { Button, Spin, Modal, Select, Input } from "antd";
+import { Button, Spin } from "antd";
 import AssignOperatorModal from "./AssignOperatorModal";
 import { useSingleProvider } from "@/hooks/useProvider";
-import { useHospitals } from "@/hooks/useHospitals";
-import { acceptBooking } from "@/api/bookingsApi";
-import toast from "react-hot-toast";
-import Images from "@/components/images";
 import { useSWRConfig } from "swr";
-
-const { Option } = Select;
 
 interface ProviderDetailsProps {
   booking: any; // Replace with your Booking type
@@ -27,24 +21,15 @@ interface ProviderDetailsProps {
 
 const ProviderDetails: React.FC<ProviderDetailsProps> = ({ booking }) => {
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
-  const [isAcceptModalOpen, setIsAcceptModalOpen] = useState(false);
-  const [reason, setReason] = useState("");
-  const [selectedHospital, setSelectedHospital] = useState("");
-  const [isProcessing, setIsProcessing] = useState(false);
   
   const { mutate } = useSWRConfig();
   
   // Get provider_id from booking
   const providerId = booking?.provider_id;
   const { provider, isLoading, mutate: mutateProvider } = useSingleProvider(providerId);
-  const { data: hospitals } = useHospitals();
 
   // Get operation_status (default to 0 if not present)
   const operationStatus = booking?.operation_status ?? 0;
-
-  const hospital_address = booking?.end_address;
-  
-  
 
   // Format date function
   const formatDate = (dateString: string) => {
@@ -57,47 +42,6 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ booking }) => {
       hour: '2-digit',
       minute: '2-digit',
     });
-  };
-
-  // Handle accept booking
-  const handleAccept = async () => {
-    if (!booking?.booking_id) return;
-
-    setIsProcessing(true);
-    const loadingToast = toast.loading('Accepting booking...');
-
-    try {
-      // Prepare payload based on whether hospital_address exists
-      const payload: any = {
-        booking_id: booking.booking_id,
-        booking_reason: reason || undefined,
-      };
-
-       if (!hospital_address) {
-          payload.hospital_id = selectedHospital || undefined;
-      }
-
-      const response = await acceptBooking(payload);
-      
-      if (response?.status === 'ok') {
-        toast.success('Booking accepted successfully!', { id: loadingToast });
-        
-        // Refresh booking data
-        mutate(`/bookings/${booking.booking_id}`);
-        mutate('/bookings');
-        
-        setIsAcceptModalOpen(false);
-        setReason("");
-        setSelectedHospital("");
-      } else {
-        const errorMsg = response?.response?.data?.msg || response?.message || 'Failed to accept booking';
-        toast.error(errorMsg, { id: loadingToast });
-      }
-    } catch (error: any) {
-      toast.error(error?.message || 'Failed to accept booking', { id: loadingToast });
-    } finally {
-      setIsProcessing(false);
-    }
   };
 
   const handleAssigned = () => {
@@ -159,15 +103,7 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ booking }) => {
           </div>
 
           <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto justify-between sm:justify-end">
-            {operationStatus === 0 && (
-              <Button 
-                onClick={() => setIsAcceptModalOpen(true)}
-                className="bg-[#DB4A47]! text-white! border-none! hover:bg-[#c63d3a]! text-xs sm:text-sm px-3 sm:px-4"
-              >
-                Accept Request
-              </Button>
-            )}
-            
+            {/* Show Assign Operator for status 1 (Admin Accepted) */}
             {operationStatus === 1 && (
               <Button 
                 onClick={() => setIsAssignModalOpen(true)}
@@ -177,29 +113,30 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ booking }) => {
               </Button>
             )}
             
-            {operationStatus === 2 && (
-              <>
-                {isProviderAssigned && (
-                  <div className="flex items-center gap-2 sm:gap-3">
-                    <Button 
-                      onClick={() => setIsAssignModalOpen(true)}
-                      className="bg-[#DB4A47]! text-white! border-none! hover:bg-[#c63d3a]! text-xs sm:text-sm px-3 sm:px-4"
-                    >
-                      Re-assign
-                    </Button>
-                    {provider?.phone_number && (
-                      <a href={`tel:${provider.phone_number}`} className="p-2 hover:bg-red-50 rounded-full transition-colors">
-                        <FiPhone className="text-[#DB4A47] cursor-pointer hover:opacity-80 w-4 h-4 sm:w-5 sm:h-5" />
-                      </a>
-                    )}
-                    {provider?.email && (
-                      <a href={`mailto:${provider.email}`} className="p-2 hover:bg-red-50 rounded-full transition-colors">
-                        <FaEnvelope className="text-[#DB4A47] cursor-pointer hover:opacity-80 w-4 h-4 sm:w-5 sm:h-5" />
-                      </a>
-                    )}
-                  </div>
+            {/* Show Re-assign for status 2 (Assigned Operator) */}
+            {operationStatus === 2 && isProviderAssigned && (
+              <Button 
+                onClick={() => setIsAssignModalOpen(true)}
+                className="bg-[#DB4A47]! text-white! border-none! hover:bg-[#c63d3a]! text-xs sm:text-sm px-3 sm:px-4"
+              >
+                Re-assign
+              </Button>
+            )}
+            
+            {/* Show contact buttons when provider is assigned */}
+            {operationStatus === 2 && isProviderAssigned && (
+              <div className="flex items-center gap-2 sm:gap-3">
+                {provider?.phone_number && (
+                  <a href={`tel:${provider.phone_number}`} className="p-2 hover:bg-red-50 rounded-full transition-colors">
+                    <FiPhone className="text-[#DB4A47] cursor-pointer hover:opacity-80 w-4 h-4 sm:w-5 sm:h-5" />
+                  </a>
                 )}
-              </>
+                {provider?.email && (
+                  <a href={`mailto:${provider.email}`} className="p-2 hover:bg-red-50 rounded-full transition-colors">
+                    <FaEnvelope className="text-[#DB4A47] cursor-pointer hover:opacity-80 w-4 h-4 sm:w-5 sm:h-5" />
+                  </a>
+                )}
+              </div>
             )}
             
             <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white flex items-center justify-center shadow-sm cursor-pointer hover:shadow-md transition-shadow">
@@ -289,93 +226,6 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ booking }) => {
         bookingId={booking?.booking_id}
         onAssigned={handleAssigned}
       />
-
-      {/* Accept Booking Modal */}
-      <Modal
-        open={isAcceptModalOpen}
-        footer={null}
-        onCancel={() => {
-          setIsAcceptModalOpen(false);
-          setReason("");
-          setSelectedHospital("");
-        }}
-        centered
-        width={500}
-      >
-        <div className="space-y-4 p-6">
-          <img src={Images.icon.caution} alt="img" />
-
-          <h2 className="text-xl font-semibold">Accept Booking?</h2>
-
-          <p className="text-gray-500">
-            This action would accept booking for{" "}
-            <strong>
-              {booking?.customer_data?.customer_name || 'this customer'}
-            </strong>
-          </p>
-
-          <div className="space-y-2">
-            <label className="text-sm text-[#354959]">Destination Hospital</label>
-            {hospital_address ? (
-              // If hospital_address exists, just display the selected hospital name or show a default message
-              <div className="bg-gray-50 p-3 rounded-md border border-gray-200">
-                <p className="text-[#000A0F] font-medium">
-                  {hospital_address}
-                </p>
-              </div>
-            ) : (
-              // If no hospital_address, show the select dropdown
-              <Select
-                placeholder="Select hospital"
-                className="w-full"
-                size="large"
-                value={selectedHospital}
-                onChange={(value) => setSelectedHospital(value)}
-                allowClear
-              >
-                {hospitals?.map((hospital: any) => (
-                  <Option key={hospital.hospital_id} value={hospital.hospital_id}>
-                    {hospital.name}
-                  </Option>
-                ))}
-              </Select>
-            )}
-          </div>
-
-          <Input.TextArea
-            rows={4}
-            placeholder="Reason for service"
-            value={reason}
-            className="min-h-[100px]!"
-            onChange={(e) => setReason(e.target.value)}
-          />
-
-          <div className="flex justify-end gap-4 mt-6">
-            <Button
-              size="large"
-              onClick={() => {
-                setIsAcceptModalOpen(false);
-                setReason("");
-                setSelectedHospital("");
-              }}
-              disabled={isProcessing}
-              className="px-8 bg-[#F5EAEA]! text-[#DB4A47]! border-none!"
-            >
-              Cancel
-            </Button>
-
-            <Button
-              size="large"
-              type="primary"
-              loading={isProcessing}
-              className="px-8 bg-[#DB4A47]! border-none!"
-              onClick={handleAccept}
-            >
-              Approve & Broadcast
-            </Button>
-          </div>
-        </div>
-      </Modal>
     </>
   );
 };
