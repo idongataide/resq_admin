@@ -29,6 +29,7 @@ interface Booking {
   phone_number: string;
   payment_method: string;
   booking_status: string;
+  operation_status: number; // 0: Incoming Booking, 1: Admin Accepted, 2: Assigned Operator, >2: show booking_status
   created_at: string;
   emergency_category: string;
   emergency_description: string;
@@ -71,9 +72,30 @@ const BookingList: React.FC<BookingListProps> = ({ bookingType }) => {
     }).replace(',', ' ·');
   };
 
+  // Get status based on operation_status or booking_status
+  const getStatus = (record: Booking) => {
+    // If operation_status > 2, use booking_status
+    if (record.operation_status > 2) {
+      return record.booking_status;
+    }
+    
+    // Otherwise, map operation_status to custom labels
+    const statusMap: Record<number, { label: string; bg: string; text: string }> = {
+      0: { label: 'Incoming Booking', bg: '#FFF7E8', text: '#BB7F05' },
+      1: { label: 'Admin Accepted', bg: '#F2F9FE', text: '#007BFF' },
+      2: { label: 'Assigned Operator', bg: '#E8F0FE', text: '#1A5F7A' },
+    };
+    
+    return statusMap[record.operation_status] || { label: 'Unknown', bg: '#F5F5F5', text: '#666666' };
+  };
+
   // Get status badge
-  const getStatusBadge = (status: string) => {
-    const statusConfig: Record<string, { bg: string; text: string; label: string }> = {
+  const getStatusBadge = (record: Booking) => {
+    const status = getStatus(record);
+    
+    // If status is a string (booking_status), use the original status config
+    if (typeof status === 'string') {
+      const statusConfig: Record<string, { bg: string; text: string; label: string }> = {
         PENDING: { bg: '#FFF7E8', text: '#BB7F05', label: 'Pending' },
         REQUEST_ACCEPTED: { bg: '#F8FEF5', text: '#4EA507', label: 'Accepted' },
         ENROUTE_PICKUP: { bg: '#F2F9FE', text: '#007BFF', label: 'En-route Pickup' },
@@ -82,18 +104,30 @@ const BookingList: React.FC<BookingListProps> = ({ bookingType }) => {
         ENROUTE_TO_DROPOFF: { bg: '#F2F9FE', text: '#007BFF', label: 'En-route to Dropoff' },
         COMPLETED: { bg: '#E8F5E9', text: '#1B5E20', label: 'Completed' },
         CANCELED: { bg: '#FDF5F5', text: '#DE3631', label: 'Cancelled' },
-    };
-
-    const config = statusConfig[status] || statusConfig.PENDING;
-    
-    return (
-       <span
-        className="px-3 py-1 rounded-md text-sm font-medium inline-flex items-center gap-2"
-        style={{ backgroundColor: config.bg, color: config.text }}
+      };
+      
+      const config = statusConfig[status] || statusConfig.PENDING;
+      
+      return (
+        <span
+          className="px-3 py-1 rounded-md text-sm font-medium inline-flex items-center gap-2"
+          style={{ backgroundColor: config.bg, color: config.text }}
         >
-        <span className="w-[6px] h-[6px] rounded-full" style={{ backgroundColor: config.text }}></span> 
-        {config.label}
+          <span className="w-[6px] h-[6px] rounded-full" style={{ backgroundColor: config.text }}></span> 
+          {config.label}
         </span>
+      );
+    }
+    
+    // Otherwise, it's an object from operation_status mapping
+    return (
+      <span
+        className="px-3 py-1 rounded-md text-sm font-medium inline-flex items-center gap-2"
+        style={{ backgroundColor: status.bg, color: status.text }}
+      >
+        <span className="w-[6px] h-[6px] rounded-full" style={{ backgroundColor: status.text }}></span> 
+        {status.label}
+      </span>
     );
   };
 
@@ -159,7 +193,6 @@ const BookingList: React.FC<BookingListProps> = ({ bookingType }) => {
     }
   };
 
-
   // Handle row click - navigate to booking details page
   const handleRowClick = (record: Booking) => {
     const id = record.schedule_id || record.booking_id;
@@ -188,10 +221,20 @@ const BookingList: React.FC<BookingListProps> = ({ bookingType }) => {
     booking.booking_id?.includes(searchText)
   );
 
+  // Check if booking can be accepted (operation_status === 0)
+  const canAcceptBooking = (record: Booking) => {
+    return record.operation_status === 0;
+  };
+
+  // Check if booking can be cancelled (operation_status <= 2)
+  const canCancelBooking = (record: Booking) => {
+    return record.operation_status <= 2;
+  };
+
   // Action menu for each row
   const actionMenu = (record: Booking) => (
     <Menu>
-      {record.booking_status === 'PENDING' && (
+      {canAcceptBooking(record) && (
         <>
           <Menu.Item 
             key="accept" 
@@ -205,23 +248,9 @@ const BookingList: React.FC<BookingListProps> = ({ bookingType }) => {
             Accept Booking
           </Menu.Item>
           <Menu.Divider />
-          <Menu.Item 
-            key="cancel" 
-            icon={<FaTimesCircle />} 
-            onClick={(e) => {
-              e.domEvent.stopPropagation();
-              setSelectedBooking(record);
-              setCancelOpen(true);
-            }}
-            danger
-          >
-            Cancel Booking
-          </Menu.Item>
         </>
       )}
-      {(record.booking_status === 'REQUEST_ACCEPTED' || record.booking_status === 'ENROUTE_PICKUP' || 
-        record.booking_status === 'ARRIVED_AT_PICKUP' || record.booking_status === 'PICKED_PATIENT' || 
-        record.booking_status === 'ENROUTE_TO_DROPOFF') && (
+      {canCancelBooking(record) && (
         <Menu.Item 
           key="cancel" 
           icon={<FaTimesCircle />} 
@@ -286,21 +315,9 @@ const BookingList: React.FC<BookingListProps> = ({ bookingType }) => {
       },
     },
     {
-        title: "Status",
-        dataIndex: "booking_status",
-        key: "booking_status",
-        render: (status: string) => getStatusBadge(status),
-        filters: [
-        { text: 'Pending', value: 'PENDING' },
-        { text: 'Accepted', value: 'REQUEST_ACCEPTED' },
-        { text: 'En-route Pickup', value: 'ENROUTE_PICKUP' },
-        { text: 'Arrived at Pickup', value: 'ARRIVED_AT_PICKUP' },
-        { text: 'Picked Patient', value: 'PICKED_PATIENT' },
-        { text: 'En-route to Dropoff', value: 'ENROUTE_TO_DROPOFF' },
-        { text: 'Completed', value: 'COMPLETED' },
-        { text: 'Cancelled', value: 'CANCELED' },
-        ],
-        onFilter: (value: boolean | React.Key, record: Booking) => record.booking_status === String(value),
+      title: "Status",
+      key: "status",
+      render: (_: any, record: Booking) => getStatusBadge(record),
     },
     {
       title: "Action",
@@ -442,7 +459,7 @@ const BookingList: React.FC<BookingListProps> = ({ bookingType }) => {
                 setSelectedBooking(null);
               }}
               disabled={isProcessing}
-              className="px-8 bg-[#F5EAEA]! text-[#DB4A47]! border-none!"
+              className="px-8 bg-[#F5EAEA]! text-[#DB4A47]! font-medium! border-none!"
             >
               Cancel
             </Button>
