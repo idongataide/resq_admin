@@ -397,9 +397,6 @@ const Ambulances = () => {
           })}
         />
 
-        <div className="flex justify-between items-center text-sm text-[#808D97] mt-4">
-          <span>Showing page 1 of {Math.ceil((ambulances?.length || 0) / 8)}</span>
-        </div>
       </div>
 
       {/* Approve Modal */}

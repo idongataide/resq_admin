@@ -289,11 +289,6 @@ const ServiceCostTable = () => {
           rowClassName="hover:bg-gray-50"
         />
 
-        {/* Footer */}
-        <div className="flex justify-between items-center text-sm text-[#808D97] mt-4">
-          <span>Showing page 1 of {Math.ceil((services?.length || 0) / 8)}</span>
-          <span>Total: {services?.length || 0} services</span>
-        </div>
       </div>
 
       {/* Approve Modal */}

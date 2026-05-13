@@ -149,9 +149,51 @@ input:-internal-autofill-selected {
   overflow-x: hidden !important;
 }
 
-.ant-table{
-  overflow-x: scroll;
+
+.ant-table {
+  overflow-x: auto;
+  scrollbar-width: thin; /* For Firefox - makes scrollbar thinner */
 }
+
+/* Hide scrollbar when not needed */
+.ant-table::-webkit-scrollbar {
+  height: 8px;
+  background-color: transparent;
+}
+
+/* Track (the background line) */
+.ant-table::-webkit-scrollbar-track {
+  background-color: transparent;
+  border-radius: 4px;
+}
+
+/* Handle (the draggable part) */
+.ant-table::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+/* Only show scrollbar when hovering over the table or when content overflows */
+.ant-table:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.ant-table::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+/* Firefox - hide until needed */
+.ant-table {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.ant-table:hover {
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+
 
 .bg-image{
   background-image: url('../images/vectors.svg');

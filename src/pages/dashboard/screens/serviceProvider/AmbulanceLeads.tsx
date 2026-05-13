@@ -147,14 +147,6 @@ const AmbulanceLeads = () => {
           })}
         />
 
-        {/* Footer */}
-        <div className="flex justify-between items-center text-sm text-[#808D97] mt-4">
-          <span>Showing page 1 of {Math.ceil((leads?.length || 0) / 8)}</span>
-          <div className="flex items-center gap-4">
-            <span>{new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
-            <span>{new Date().toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })}</span>
-          </div>
-        </div>
       </div>
 
       {/* View Details Modal */}
