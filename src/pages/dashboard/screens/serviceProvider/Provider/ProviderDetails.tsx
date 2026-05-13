@@ -110,7 +110,7 @@ const ProviderDetails = () => {
               
               {/* Header */}
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-semibold text-[#000A0F]">
+                <h2 className="text-2xl font-semibold text-[#000A0F] capitalize">
                   {provider.name}
                 </h2>
 
