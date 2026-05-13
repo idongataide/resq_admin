@@ -59,7 +59,6 @@ const BookingList: React.FC<BookingListProps> = ({ bookingType }) => {
 
   const { data: bookings, isLoading, mutate } = useBookings(bookingType);
   const { data: hospitals } = useHospitals();
-  const isEmergencyBooking = bookingType === "emergency";
 
 
   // Format date
