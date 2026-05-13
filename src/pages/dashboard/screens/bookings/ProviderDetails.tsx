@@ -42,6 +42,10 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ booking }) => {
   // Get operation_status (default to 0 if not present)
   const operationStatus = booking?.operation_status ?? 0;
 
+  const hospital_address = booking?.end_address;
+  
+  
+
   // Format date function
   const formatDate = (dateString: string) => {
     if (!dateString) return "N/A";
@@ -63,11 +67,17 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ booking }) => {
     const loadingToast = toast.loading('Accepting booking...');
 
     try {
-      const response = await acceptBooking({
+      // Prepare payload based on whether hospital_address exists
+      const payload: any = {
         booking_id: booking.booking_id,
-        hospital_id: selectedHospital || undefined,
         booking_reason: reason || undefined,
-      });
+      };
+
+       if (!hospital_address) {
+          payload.hospital_id = selectedHospital || undefined;
+      }
+
+      const response = await acceptBooking(payload);
       
       if (response?.status === 'ok') {
         toast.success('Booking accepted successfully!', { id: loadingToast });
@@ -306,26 +316,37 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ booking }) => {
 
           <div className="space-y-2">
             <label className="text-sm text-[#354959]">Destination Hospital</label>
-            <Select
-              placeholder="Select hospital"
-              className="w-full"
-              size="large"
-              value={selectedHospital}
-              onChange={(value) => setSelectedHospital(value)}
-              allowClear
-            >
-              {hospitals?.map((hospital: any) => (
-                <Option key={hospital.hospital_id} value={hospital.hospital_id}>
-                  {hospital.name}
-                </Option>
-              ))}
-            </Select>
+            {hospital_address ? (
+              // If hospital_address exists, just display the selected hospital name or show a default message
+              <div className="bg-gray-50 p-3 rounded-md border border-gray-200">
+                <p className="text-[#000A0F] font-medium">
+                  {hospital_address}
+                </p>
+              </div>
+            ) : (
+              // If no hospital_address, show the select dropdown
+              <Select
+                placeholder="Select hospital"
+                className="w-full"
+                size="large"
+                value={selectedHospital}
+                onChange={(value) => setSelectedHospital(value)}
+                allowClear
+              >
+                {hospitals?.map((hospital: any) => (
+                  <Option key={hospital.hospital_id} value={hospital.hospital_id}>
+                    {hospital.name}
+                  </Option>
+                ))}
+              </Select>
+            )}
           </div>
 
           <Input.TextArea
             rows={4}
             placeholder="Reason for service"
             value={reason}
+            className="min-h-[100px]!"
             onChange={(e) => setReason(e.target.value)}
           />
 
