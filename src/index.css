@@ -194,6 +194,10 @@ input:-internal-autofill-selected {
 }
 
 
+.ant-table-cell{
+  text-transform: capitalize;
+}
+
 
 .bg-image{
   background-image: url('../images/vectors.svg');
