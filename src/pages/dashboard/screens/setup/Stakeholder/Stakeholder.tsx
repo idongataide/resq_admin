@@ -280,14 +280,6 @@ const StakeholderDisbursementTable = ({ isNonEmergency = false }: StakeholderDis
           rowClassName="hover:bg-gray-50 transition-colors"
         />
 
-        {/* Footer with time and date */}
-        <div className="px-6 py-3 border-t border-gray-200 bg-white flex justify-between items-center text-sm text-[#808D97]">
-          <div>Type here to search</div>
-          <div className="flex items-center gap-4">
-            <span>{new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
-            <span>{new Date().toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })}</span>
-          </div>
-        </div>
       </div>
 
       {/* Modals - These will auto-detect the route */}

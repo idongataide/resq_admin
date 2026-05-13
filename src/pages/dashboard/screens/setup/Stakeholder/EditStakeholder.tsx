@@ -35,6 +35,7 @@ const UpdateStakeholderModal: React.FC<UpdateStakeholderModalProps> = ({
   const [isVerifying, setIsVerifying] = useState(false);
   const [accountName, setAccountName] = useState<string>("");
   const [selectedBank, setSelectedBank] = useState<Bank | null>(null);
+  const [amountType, setAmountType] = useState<string>("percentage"); // Track amount type
   
   const { data: bankList, isLoading: isLoadingBanks } = useBanksList();
   const { mutate: globalMutate } = useSWRConfig();
@@ -45,8 +46,10 @@ const UpdateStakeholderModal: React.FC<UpdateStakeholderModalProps> = ({
     if (stakeholder && open) {
       // Extract bank data from nested structure
       const bankData = stakeholder.bank_data || {};
+      const stakeholderAmountType = stakeholder.amount_type || 'percentage';
       
       setAccountName(bankData.account_name || "");
+      setAmountType(stakeholderAmountType);
       
       // Find the bank to set selectedBank
       const bank = bankList?.find((b: Bank) => b.name === bankData.bank_name);
@@ -61,7 +64,7 @@ const UpdateStakeholderModal: React.FC<UpdateStakeholderModalProps> = ({
         account_number: bankData.account_number,
         account_name: bankData.account_name,
         amount: stakeholder.amount?.toString(),
-        amount_type: stakeholder.amount_type || 'percentage',
+        amount_type: stakeholderAmountType,
       });
     }
   }, [stakeholder, open, form, bankList]);
@@ -72,6 +75,7 @@ const UpdateStakeholderModal: React.FC<UpdateStakeholderModalProps> = ({
       form.resetFields();
       setAccountName("");
       setSelectedBank(null);
+      setAmountType("percentage");
     }
   }, [open, form]);
 
@@ -84,6 +88,11 @@ const UpdateStakeholderModal: React.FC<UpdateStakeholderModalProps> = ({
       setAccountName("");
       form.setFieldsValue({ account_name: "" });
     }
+  };
+
+  const handleAmountTypeChange = (value: string) => {
+    setAmountType(value);
+    form.setFieldsValue({ amount: undefined }); // Clear amount when type changes
   };
 
   const handleAccountNumberChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -177,6 +186,7 @@ const UpdateStakeholderModal: React.FC<UpdateStakeholderModalProps> = ({
         form.resetFields();
         setAccountName("");
         setSelectedBank(null);
+        setAmountType("percentage");
         
         onSuccess?.();
         onClose();
@@ -308,10 +318,7 @@ const UpdateStakeholderModal: React.FC<UpdateStakeholderModalProps> = ({
             placeholder="Select amount type"
             size="large"
             className="rounded-lg!"
-            onChange={() => {
-              // Force re-render to update the label
-              form.setFieldsValue({ amount: undefined });
-            }}
+            onChange={handleAmountTypeChange}
           >
             <Option value="percentage">Percentage (%)</Option>
             <Option value="amount">Fixed Amount (₦)</Option>
@@ -323,18 +330,34 @@ const UpdateStakeholderModal: React.FC<UpdateStakeholderModalProps> = ({
           name="amount"
           label={
             <span className="block text-sm text-[#354959]">
-              {form.getFieldValue('amount_type') === 'percentage' ? 'Value (%)' : 'Amount (₦)'}
+              {amountType === 'percentage' ? 'Value (%)' : 'Amount (₦)'}
             </span>
           }
-          rules={[{ required: true, message: 'Please enter value' }]}
+          rules={[
+            { required: true, message: 'Please enter value' },
+            {
+              validator: (_, value) => {
+                if (!value && value !== 0) return Promise.reject(new Error('Please enter value'));
+                const num = parseFloat(value);
+                if (isNaN(num)) return Promise.reject(new Error('Please enter a valid number'));
+                if (amountType === 'percentage' && (num < 0 || num > 100)) {
+                  return Promise.reject(new Error('Percentage must be between 0 and 100'));
+                }
+                if (amountType === 'amount' && num < 0) {
+                  return Promise.reject(new Error('Amount must be greater than 0'));
+                }
+                return Promise.resolve();
+              }
+            }
+          ]}
         >
           <Input
             className="rounded-lg!"
-            placeholder={form.getFieldValue('amount_type') === 'percentage' ? 'Enter percentage value' : 'Enter amount'}
-            suffix={form.getFieldValue('amount_type') === 'percentage' ? '%' : '₦'}
+            placeholder={amountType === 'percentage' ? 'Enter percentage value' : 'Enter amount'}
+            suffix={amountType === 'percentage' ? '%' : '₦'}
             type="number"
-            min="0"
-            step="0.01"
+            min={amountType === 'percentage' ? 0 : 0.01}
+            step={amountType === 'percentage' ? 1 : 0.01}
           />
         </Form.Item>
 

@@ -33,6 +33,7 @@ const AddStakeholderModal: React.FC<AddStakeholderModalProps> = ({
   const [isVerifying, setIsVerifying] = useState(false);
   const [accountName, setAccountName] = useState<string>("");
   const [selectedBank, setSelectedBank] = useState<Bank | null>(null);
+  const [amountType, setAmountType] = useState<string>("percentage"); // Track amount type
   
   const { data: bankList, isLoading: isLoadingBanks } = useBanksList();
   const { mutate: globalMutate } = useSWRConfig();
@@ -44,6 +45,8 @@ const AddStakeholderModal: React.FC<AddStakeholderModalProps> = ({
       form.resetFields();
       setAccountName("");
       setSelectedBank(null);
+      setAmountType("percentage"); // Reset amount type
+      form.setFieldsValue({ amount_type: "percentage" }); // Reset form value
     }
   }, [open, form]);
 
@@ -92,6 +95,11 @@ const AddStakeholderModal: React.FC<AddStakeholderModalProps> = ({
     }
   };
 
+  const handleAmountTypeChange = (value: string) => {
+    setAmountType(value);
+    form.setFieldsValue({ amount: undefined }); // Clear amount when type changes
+  };
+
   const handleSubmit = async (values: any) => {
     setIsSubmitting(true);
     const loadingToast = toast.loading(
@@ -132,6 +140,7 @@ const AddStakeholderModal: React.FC<AddStakeholderModalProps> = ({
         form.resetFields();
         setAccountName("");
         setSelectedBank(null);
+        setAmountType("percentage");
         
         onSuccess?.();
         onClose();
@@ -257,6 +266,7 @@ const AddStakeholderModal: React.FC<AddStakeholderModalProps> = ({
             placeholder="Select amount type"
             size="large"
             className="rounded-lg!"
+            onChange={handleAmountTypeChange}
           >
             <Option value="percentage">Percentage (%)</Option>
             <Option value="amount">Fixed Amount (₦)</Option>
@@ -268,18 +278,34 @@ const AddStakeholderModal: React.FC<AddStakeholderModalProps> = ({
           name="amount"
           label={
             <span className="block text-sm text-[#354959]">
-              {form.getFieldValue('amount_type') === 'percentage' ? 'Value (%)' : 'Amount (₦)'}
+              {amountType === 'percentage' ? 'Value (%)' : 'Amount (₦)'}
             </span>
           }
-          rules={[{ required: true, message: 'Please enter value' }]}
+          rules={[
+            { required: true, message: 'Please enter value' },
+            {
+              validator: (_, value) => {
+                if (!value && value !== 0) return Promise.reject(new Error('Please enter value'));
+                const num = parseFloat(value);
+                if (isNaN(num)) return Promise.reject(new Error('Please enter a valid number'));
+                if (amountType === 'percentage' && (num < 0 || num > 100)) {
+                  return Promise.reject(new Error('Percentage must be between 0 and 100'));
+                }
+                if (amountType === 'amount' && num < 0) {
+                  return Promise.reject(new Error('Amount must be greater than 0'));
+                }
+                return Promise.resolve();
+              }
+            }
+          ]}
         >
           <Input
             className="rounded-lg!"
-            placeholder={form.getFieldValue('amount_type') === 'percentage' ? 'Enter percentage value' : 'Enter amount'}
-            suffix={form.getFieldValue('amount_type') === 'percentage' ? '%' : '₦'}
+            placeholder={amountType === 'percentage' ? 'Enter percentage value' : 'Enter amount'}
+            suffix={amountType === 'percentage' ? '%' : '₦'}
             type="number"
-            min="0"
-            step="0.01"
+            min={amountType === 'percentage' ? 0 : 0.01}
+            step={amountType === 'percentage' ? 1 : 0.01}
           />
         </Form.Item>
 
