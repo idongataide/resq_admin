@@ -1,6 +1,6 @@
 // components/settings/AddFeeModal.tsx
 import React, { useState } from "react";
-import { Modal, Form, Input, Button, Select } from "antd";
+import { Modal, Form, Input, Button } from "antd";
 import { FiX } from "react-icons/fi";
 import toast from "react-hot-toast";
 import { addFees, addNonEmergencyFee } from "@/api/settingsApi";

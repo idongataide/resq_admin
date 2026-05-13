@@ -1,6 +1,6 @@
 // components/settings/EditFeeModal.tsx
 import React, { useState, useEffect } from "react";
-import { Modal, Form, Input, Button, Select } from "antd";
+import { Modal, Form, Input, Button } from "antd";
 import { FiX } from "react-icons/fi";
 import toast from "react-hot-toast";
 import { updateFee, updateNonEmergencyFee } from "@/api/settingsApi";

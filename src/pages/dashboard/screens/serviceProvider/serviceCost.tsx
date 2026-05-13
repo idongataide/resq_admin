@@ -15,26 +15,24 @@ import { updateServiceStatus } from "@/api/providerApi";
 import { useProviderServices } from "@/hooks/useProvider";
 
 interface Service {
-  service_id?: string;
-  id?: string;
+  service_id: string;
   auth_id: string;
   provider_id: string;
   name: string;
   amount: number;
   status: number; // 0 = Pending, 1 = Approved, 2 = Rejected
   service_type?: string;
-  createdAt?: string;
-  updatedAt?: string;
+  category?: string;
+  rejected_note?: string;
+  createdAt: string;
+  updatedAt: string;
+  provider_data?: Array<{
+    _id: string;
+    name: string;
+    email: string;
+    phone_number: string;
+  }>;
 }
-
-// Status mapping
-const statusMap = {
-  0: 'pending',
-  1: 'approved',
-  2: 'rejected'
-} as const;
-
-type StatusType = 'pending' | 'approved' | 'rejected';
 
 const ServiceCostTable = () => {
   const { provider_id } = useParams<{ provider_id: string }>();
@@ -46,7 +44,6 @@ const ServiceCostTable = () => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const { data: services, isLoading, mutate } = useProviderServices(provider_id);
-
 
   // Format date
   const formatDate = (dateString?: string) => {
@@ -61,14 +58,9 @@ const ServiceCostTable = () => {
     }).replace(',', ' ·');
   };
 
-  // Get status as string
-  const getStatusString = (record: Service): StatusType => {
-    return statusMap[record.status as keyof typeof statusMap] || 'pending';
-  };
-
   // Handle approve
   const handleApprove = async () => {
-    const serviceId = selectedService?.service_id || selectedService?.service_id;
+    const serviceId = selectedService?.service_id;
     if (!serviceId) return;
 
     setIsProcessing(true);
@@ -76,7 +68,7 @@ const ServiceCostTable = () => {
 
     try {
       const response = await updateServiceStatus(serviceId, {
-        status: "1", // "1" for approve/activate
+        status: "1", // "1" for approve
       });
       
       if (response.status === 'ok') {
@@ -97,7 +89,7 @@ const ServiceCostTable = () => {
 
   // Handle reject
   const handleReject = async () => {
-    const serviceId = selectedService?.service_id || selectedService?.service_id;
+    const serviceId = selectedService?.service_id;
     if (!serviceId) return;
     
     if (!reason.trim()) {
@@ -132,16 +124,14 @@ const ServiceCostTable = () => {
   };
 
   // Get status badge
-  const getStatusBadge = (record: Service) => {
-    const statusString = getStatusString(record);
-
-    const statusConfig: Record<StatusType, { bg: string; text: string; label: string }> = {
-      pending: { bg: '#FFF7E8', text: '#BB7F05', label: 'Pending' },
-      approved: { bg: '#F8FEF5', text: '#4EA507', label: 'Approved' },
-      rejected: { bg: '#FEE9E7', text: '#DB4A47', label: 'Rejected' },
+  const getStatusBadge = (status: number) => {
+    const statusConfig = {
+      0: { bg: '#FFF7E8', text: '#BB7F05', label: 'Pending' },      // Pending
+      1: { bg: '#F8FEF5', text: '#4EA507', label: 'Approved' },      // Approved
+      2: { bg: '#FEE9E7', text: '#DB4A47', label: 'Rejected' },      // Rejected
     };
 
-    const config = statusConfig[statusString] || statusConfig.pending;
+    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig[0];
     
     return (
       <span
@@ -182,7 +172,7 @@ const ServiceCostTable = () => {
       title: "Category",
       dataIndex: "category",
       key: "category",
-      render: (type: string) => type || "—",
+      render: (category: string) => category || "—",
     },
     {
       title: "Service Type",
@@ -193,16 +183,14 @@ const ServiceCostTable = () => {
     {
       title: "Status",
       key: "status",
-      render: (_: any, record: Service) => getStatusBadge(record),
+      render: (_: any, record: Service) => getStatusBadge(record.status),
     },
     {
       title: "Action",
       key: "action",
       render: (_: any, record: Service) => {
-        const statusString = getStatusString(record);
-        
-        // For Pending: Show both Approve and Reject
-        if (statusString === "pending") {
+        // If status is 0 (Pending): Show both Approve and Reject
+        if (record.status === 0) {
           return (
             <div className="flex gap-3">
               <Button
@@ -227,8 +215,25 @@ const ServiceCostTable = () => {
           );
         }
         
-        // For Rejected: Show Approve only
-        if (statusString === "rejected") {
+        // If status is 1 (Approved): Show Reject only
+        if (record.status === 1) {
+          return (
+            <div className="flex gap-3">
+              <Button
+                icon={<CloseOutlined />}
+                className="bg-[#FBE9E7]! text-[#DB4A47]! border-0! rounded-lg!"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedService(record);
+                  setRejectOpen(true);
+                }}
+              />
+            </div>
+          );
+        }
+        
+        // If status is 2 (Rejected): Show Approve only
+        if (record.status === 2) {
           return (
             <div className="flex gap-3">
               <Button
@@ -244,7 +249,6 @@ const ServiceCostTable = () => {
           );
         }
         
-        // For Approved: No actions
         return null;
       },
     },
@@ -285,7 +289,7 @@ const ServiceCostTable = () => {
           }}
           columns={columns}
           dataSource={services}
-          rowKey={(record) => record.service_id || record.id || record.name}
+          rowKey={(record) => record.service_id}
           loading={isLoading}
           pagination={{
             pageSize: 8,
@@ -294,6 +298,11 @@ const ServiceCostTable = () => {
           rowClassName="hover:bg-gray-50"
         />
 
+        {/* Footer */}
+        <div className="flex justify-between items-center text-sm text-[#808D97] mt-4">
+          <span>Showing page 1 of {Math.ceil((services?.length || 0) / 8)}</span>
+          <span>Total: {services?.length || 0} services</span>
+        </div>
       </div>
 
       {/* Approve Modal */}
@@ -313,7 +322,7 @@ const ServiceCostTable = () => {
 
           <p className="text-gray-500">
             This action would approve{" "}
-            <strong>{selectedService?.name}</strong> and is irreversible.
+            <strong>{selectedService?.name}</strong>
           </p>
 
           <div className="flex justify-end gap-4 mt-6">
@@ -360,7 +369,7 @@ const ServiceCostTable = () => {
 
           <p className="text-gray-500">
             This action would reject{" "}
-            <strong>{selectedService?.name}</strong> and is irreversible.
+            <strong>{selectedService?.name}</strong>.
           </p>
 
           <Input.TextArea
@@ -368,6 +377,7 @@ const ServiceCostTable = () => {
             placeholder="Reason for rejection"
             value={reason}
             onChange={(e) => setReason(e.target.value)}
+            className="min-h-[100px]!"
           />
 
           <div className="flex justify-end gap-4 mt-6">
