@@ -25,7 +25,7 @@ export const addFees = async (data: any) => {
   }
 };
 
-export const updateFee = async (feeId: string, data: { amount: string; name: string; amount_type: string; }) => {
+export const updateFee = async (feeId: string, data: { amount: string; name: string; }) => {
   try {
     return await axiosAPIInstance
       .put(`/settings/fees/${feeId}`, data)
@@ -74,7 +74,7 @@ export const addNonEmergencyFee = async (data: any) => {
   }
 };
 
-export const updateNonEmergencyFee = async (feeId: string, data: { amount: string; name: string; amount_type: string; }) => {
+export const updateNonEmergencyFee = async (feeId: string, data: { amount: string; name: string }) => {
   try {
     return await axiosAPIInstance
       .put(`/settings/non-emergency-fees/${feeId}`, data)

@@ -16,7 +16,7 @@ interface AddFeeModalProps {
 interface FormValues {
   cost_name: string;
   amount: number;
-  type: "percentage" | "fixed";
+  // type: "percentage" | "fixed";
 }
 
 const AddFeeModal: React.FC<AddFeeModalProps> = ({
@@ -43,14 +43,14 @@ const AddFeeModal: React.FC<AddFeeModalProps> = ({
         response = await addNonEmergencyFee({
           name: values.cost_name,
           amount: values.amount,
-          amount_type: values.type,
+          // amount_type: values.type,
         });
       } else {
         // Use emergency API
         response = await addFees({
           name: values.cost_name,
           amount: values.amount,
-          type: values.type,
+          // type: values.type,
         });
       }
       
@@ -150,7 +150,7 @@ const AddFeeModal: React.FC<AddFeeModalProps> = ({
           </Form.Item>
 
           {/* Type Selection */}
-          <Form.Item
+          {/* <Form.Item
             name="type"
             label="Cost Type"
             rules={[{ required: true, message: 'Please select cost type' }]}
@@ -164,7 +164,7 @@ const AddFeeModal: React.FC<AddFeeModalProps> = ({
                 { label: 'Fixed Amount', value: 'fixed' }
               ]}
             />
-          </Form.Item>
+          </Form.Item> */}
 
           {/* Amount */}
           <Form.Item

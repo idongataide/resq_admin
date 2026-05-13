@@ -47,7 +47,6 @@ const ServiceCostTable = () => {
 
   const { data: services, isLoading, mutate } = useProviderServices(provider_id);
 
-  console.log("services", services);
 
   // Format date
   const formatDate = (dateString?: string) => {
@@ -178,6 +177,12 @@ const ServiceCostTable = () => {
       render: (amount: number) => (
         <span>₦{amount?.toLocaleString()}</span>
       ),
+    },
+    {
+      title: "Category",
+      dataIndex: "category",
+      key: "category",
+      render: (type: string) => type || "—",
     },
     {
       title: "Service Type",

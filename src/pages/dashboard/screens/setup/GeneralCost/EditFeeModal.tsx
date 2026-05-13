@@ -13,7 +13,7 @@ interface Fee {
   amount: number;
   tag?: string;
   slug?: string;
-  amount_type?: string;
+  // amount_type?: string;
   amount_sufix?: string;
   system_generated?: boolean;
   createdAt?: string;
@@ -30,7 +30,7 @@ interface EditFeeModalProps {
 interface FormValues {
   name: string;
   amount: number;
-  amount_type: "percentage" | "fixed";
+  // amount_type: "percentage" | "fixed";
 }
 
 const EditFeeModal: React.FC<EditFeeModalProps> = ({
@@ -49,7 +49,7 @@ const EditFeeModal: React.FC<EditFeeModalProps> = ({
       form.setFieldsValue({
         name: fee.name || '',
         amount: fee.amount || 0,
-        amount_type: (fee.amount_type?.toLowerCase() === 'percentage' ? 'percentage' : 'fixed') as "percentage" | "fixed",
+        // amount_type: (fee.amount_type?.toLowerCase() === 'percentage' ? 'percentage' : 'fixed') as "percentage" | "fixed",
       });
     }
   }, [fee, open, form]);
@@ -72,13 +72,13 @@ const EditFeeModal: React.FC<EditFeeModalProps> = ({
         response = await updateNonEmergencyFee(fee.fee_id, {
           name: values.name,
           amount: values.amount.toString(),
-          amount_type: values.amount_type,
+          // amount_type: values.amount_type,
         });
       } else {
         response = await updateFee(fee.fee_id, {
           name: values.name,
           amount: values.amount.toString(),
-          amount_type: values.amount_type,
+          // amount_type: values.amount_type,
         });
       }
       
@@ -174,7 +174,7 @@ const EditFeeModal: React.FC<EditFeeModalProps> = ({
           </Form.Item>
 
           {/* Type Selection */}
-          <Form.Item
+          {/* <Form.Item
             name="amount_type"
             label="Cost Type"
             rules={[{ required: true, message: 'Please select cost type' }]}
@@ -188,7 +188,7 @@ const EditFeeModal: React.FC<EditFeeModalProps> = ({
                 { label: 'Fixed Amount', value: 'fixed' }
               ]}
             />
-          </Form.Item>
+          </Form.Item> */}
 
           {/* Amount */}
           <Form.Item
