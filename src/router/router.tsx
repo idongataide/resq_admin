@@ -17,7 +17,6 @@ import PatientsDetails from "@/pages/dashboard/screens/patients/patientsDetails"
 import BookingLayouts from "@/pages/dashboard/screens/bookings/bookingLayouts";
 import BookingDetailsLayouts from "@/pages/dashboard/screens/bookings/bookingDetailsLayouts";
 import ActivityLog from "@/pages/dashboard/screens/activity-log/activityLog";
-import BookingList from "@/pages/dashboard/screens/bookings/bookingList";
 
 
 const DashboadScreen = lazy(() =>
