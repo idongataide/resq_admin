@@ -156,7 +156,7 @@ const ProviderDetails = () => {
                     <FaMapMarkerAlt className="mt-1 text-gray-500" />
                     <div>
                       <p className="text-gray-500">Address</p>
-                      <p className="font-medium text-[#000A0F]">
+                      <p className="font-medium text-[#000A0F] capitalize">
                         {provider.location || 'N/A'}
                       </p>
                     </div>

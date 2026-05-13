@@ -159,7 +159,7 @@ const ServiceCostTable = () => {
       title: "Last Modified",
       dataIndex: "updatedAt",
       key: "updatedAt",
-      render: (text: string, record: Service) => (
+      render: (_text: string, record: Service) => (
         <div className="flex items-center gap-2 text-[#354959]">
           <FiClock className="text-gray-400" />
           {formatDate(record.updatedAt || record.createdAt)}
