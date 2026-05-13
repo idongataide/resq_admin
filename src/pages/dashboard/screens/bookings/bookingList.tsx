@@ -59,6 +59,8 @@ const BookingList: React.FC<BookingListProps> = ({ bookingType }) => {
 
   const { data: bookings, isLoading, mutate } = useBookings(bookingType);
   const { data: hospitals } = useHospitals();
+  const isEmergencyBooking = bookingType === "emergency";
+
 
   // Format date
   const formatDate = (dateString: string) => {
@@ -267,7 +269,7 @@ const BookingList: React.FC<BookingListProps> = ({ bookingType }) => {
     </Menu>
   );
 
-  // Table columns
+
   const columns = [
     {
       title: "Date & Time",
@@ -305,6 +307,16 @@ const BookingList: React.FC<BookingListProps> = ({ bookingType }) => {
         <span>{record.customer_data?.customer_phone || record.phone_number || 'N/A'}</span>
       ),
     },
+    
+    // Only show Service Type for non-emergency bookings
+    ...(bookingType === "non-emergency" ? [{
+      title: "Service Type",
+      key: "booking_reason",
+      render: (_: any, record: Booking) => (
+        <span>{record.booking_reason || 'Emergency'}</span>
+      ),
+    }] : []),
+    
     {
       title: "Payment Method",
       dataIndex: "payment_method",

@@ -51,7 +51,6 @@ const BookingLayouts: React.FC = () => {
           tabBarStyle={{ marginBottom: 14 }}
           tabBarGutter={12}
         />
-        {/* Render booking list directly, not through Outlet */}
         <BookingList bookingType={getBookingType()} />
       </div>
     </div>
