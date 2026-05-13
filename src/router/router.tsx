@@ -54,36 +54,39 @@ export const routes = createBrowserRouter([
         ),
       },
       
-      {
-          path: "/bookings",
-          element: (
-            <Suspense fallback={<LoadingScreen />}>
-              <BookingLayouts />
-            </Suspense>
-          ),
-          children: [
-            {
-              index: true,
-              element: <BookingList />,
-            },
-            {
-              path: "emergency",
-              element: <BookingList />,
-            },
-            {
-              path: "schedule",
-              element: <BookingList bookingType="non-emergency" />,
-            },
-            {
-              path: "schedule/:booking_id",
-              element: <BookingDetailsLayouts />,
-            },
-            {
-              path: ":booking_id",
-              element: <BookingDetailsLayouts />,
-            },
-          ]
-        },
+    {
+        path: "/bookings",
+        children: [
+          {
+            index: true,
+            element: <BookingLayouts />,  
+          },
+          {
+            path: "emergency",
+            element: <BookingLayouts />,  
+          },
+          {
+            path: "non-emergency",
+            element: <BookingLayouts />,  
+          },
+          {
+            path: "schedule/:booking_id",
+            element: (
+              <Suspense fallback={<LoadingScreen />}>
+                <BookingDetailsLayouts />  
+              </Suspense>
+            ),
+          },
+          {
+            path: ":booking_id",
+            element: (
+              <Suspense fallback={<LoadingScreen />}>
+                <BookingDetailsLayouts />  
+              </Suspense>
+            ),
+          },
+        ]
+      },
       {
         path: "/patients",
         element: (

@@ -235,3 +235,11 @@ input:-internal-autofill-selected {
     transform: translateX(0);
   }
 }
+
+.ant-table-pagination {
+    padding: 10px 30px;
+}
+
+td, th {
+    padding: 20px 26px !important;
+}

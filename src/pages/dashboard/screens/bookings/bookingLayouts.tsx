@@ -1,21 +1,28 @@
 import React from "react";
-import { useNavigate, useLocation, Outlet } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import BookingMetrics from "./bookingsStat";
 import { Tabs } from "antd";
+import BookingList from "./bookingList";
 
 const BookingLayouts: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
   const getActiveKey = () => {
-    if (location.pathname === "/bookings/schedule") return "non-emergency";
     if (location.pathname === "/bookings/emergency") return "emergency";
+    if (location.pathname === "/bookings/non-emergency") return "non-emergency";
+    return "all";
+  };
+  
+  const getBookingType = () => {
+    if (location.pathname === "/bookings/emergency") return "emergency";
+    if (location.pathname === "/bookings/non-emergency") return "non-emergency";
     return "all";
   };
   
   const handleTabChange = (key: string) => {
     if (key === "non-emergency") {
-      navigate("/bookings/schedule");
+      navigate("/bookings/non-emergency");
     } else if (key === "emergency") {
       navigate("/bookings/emergency");
     } else {
@@ -44,7 +51,8 @@ const BookingLayouts: React.FC = () => {
           tabBarStyle={{ marginBottom: 14 }}
           tabBarGutter={12}
         />
-        <Outlet />
+        {/* Render booking list directly, not through Outlet */}
+        <BookingList bookingType={getBookingType()} />
       </div>
     </div>
   );
