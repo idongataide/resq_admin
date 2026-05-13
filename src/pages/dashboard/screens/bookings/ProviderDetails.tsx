@@ -90,9 +90,7 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ booking }) => {
     }
   };
 
-  // Handle successful assignment
   const handleAssigned = () => {
-    // Refresh booking data to get updated provider_id
     mutate(`/bookings/${booking?.booking_id}`);
     mutate('/bookings');
     
@@ -114,7 +112,6 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ booking }) => {
     approvalReasons: booking?.booking_reason  || "No approval reasons provided",
   };
 
-  // Check if provider is assigned
   const isProviderAssigned = !!providerId && !!provider;
 
   if (isLoading) {
@@ -152,7 +149,6 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ booking }) => {
           </div>
 
           <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto justify-between sm:justify-end">
-            {/* Show different buttons based on operation_status */}
             {operationStatus === 0 && (
               <Button 
                 onClick={() => setIsAcceptModalOpen(true)}
@@ -203,7 +199,6 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ booking }) => {
         </div>
 
         <div className="p-4 sm:p-6">
-          {/* Provider Status if suspended */}
           {provider?.account_status !== 0 && provider?.suspend_reason && (
             <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
               <p className="text-xs sm:text-sm text-red-600">
@@ -213,9 +208,7 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ booking }) => {
             </div>
           )}
 
-          {/* Info Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-x-8 sm:gap-y-6 text-xs sm:text-sm text-[#808D97]">
-            {/* Provider Name */}
             <div className="flex items-start gap-2 sm:gap-3">
               <FiUser className="w-4 h-4 sm:w-5 sm:h-5 text-[#808D97] mt-1 flex-shrink-0" />
               <div className="min-w-0 flex-1">
@@ -224,7 +217,6 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ booking }) => {
               </div>
             </div>
 
-            {/* Contact */}
             <div className="flex items-start gap-2 sm:gap-3">
               <FiPhone className="w-4 h-4 sm:w-5 sm:h-5 text-[#808D97] mt-1 flex-shrink-0" />
               <div className="min-w-0 flex-1">
@@ -233,7 +225,6 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ booking }) => {
               </div>
             </div>
 
-            {/* Approval Date & Time */}
             <div className="flex items-start gap-2 sm:gap-3">
               <FiCalendar className="w-4 h-4 sm:w-5 sm:h-5 text-[#808D97] mt-1 flex-shrink-0" />
               <div className="min-w-0 flex-1">
@@ -242,7 +233,6 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ booking }) => {
               </div>
             </div>
 
-            {/* Ambulance Plate */}
             <div className="flex items-start gap-2 sm:gap-3">
               <FiTruck className="w-4 h-4 sm:w-5 sm:h-5 text-[#808D97] mt-1 flex-shrink-0" />
               <div className="min-w-0 flex-1">
@@ -251,7 +241,6 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ booking }) => {
               </div>
             </div>
 
-            {/* Colour/Model */}
             <div className="flex items-start gap-2 sm:gap-3">
               <FiTruck className="w-4 h-4 sm:w-5 sm:h-5 text-[#808D97] mt-1 flex-shrink-0" />
               <div className="min-w-0 flex-1">
@@ -260,7 +249,6 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ booking }) => {
               </div>
             </div>
 
-            {/* Ambulance Lead Name */}
             <div className="flex items-start gap-2 sm:gap-3">
               <FiUserCheck className="w-4 h-4 sm:w-5 sm:h-5 text-[#808D97] mt-1 flex-shrink-0" />
               <div className="min-w-0 flex-1">
@@ -270,7 +258,6 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ booking }) => {
             </div>
           </div>
 
-          {/* Approval Reasons */}
           <div className="mt-6">
             <div className="bg-[#F5F6F7] rounded-xl p-4 sm:p-5">
               <div className="flex items-center gap-2 mb-2 sm:mb-3">

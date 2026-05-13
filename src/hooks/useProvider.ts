@@ -1,5 +1,5 @@
 import useSWR from "swr";
-import { getProviders, getSingleProvider, getProviderAmbulances, getProviderAmbulanceLeads } from "@/api/providerApi";
+import { getProviders, getSingleProvider, getProviderServices, getProviderAmbulances, getProviderAmbulanceLeads } from "@/api/providerApi";
 
 export const useProviders = () => {
   const { data, isLoading, mutate } = useSWR(
@@ -59,6 +59,23 @@ export const useProviderAmbulanceLeads = (provider_id: string | undefined) => {
   const { data, isLoading, mutate } = useSWR(
     provider_id ? `/providers/lead-lists?provider_id=${provider_id}` : null,
     () => provider_id ? getProviderAmbulanceLeads(provider_id) : null,
+    {
+      revalidateOnFocus: false,
+    }
+  );
+
+  return {
+    data: data?.status === 'ok' ? data?.data : [],
+    isLoading,
+    mutate,
+  };
+};
+
+
+export const useProviderServices = (provider_id: string | undefined) => {
+  const { data, isLoading, mutate } = useSWR(
+    provider_id ? `/providers/services?provider_id=${provider_id}` : null,
+    () => provider_id ? getProviderServices(provider_id) : null,
     {
       revalidateOnFocus: false,
     }

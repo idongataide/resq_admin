@@ -366,7 +366,7 @@ const BookingList: React.FC<BookingListProps> = ({ bookingType }) => {
         <Table
           columns={columns}
           dataSource={filteredBookings}
-          rowKey="booking_id"
+          rowKey={(record) => record.booking_id || record.schedule_id || ''}
           loading={isLoading}
           pagination={{
             pageSize: 10,

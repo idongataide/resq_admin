@@ -103,3 +103,34 @@ export const getProviderAmbulanceLeads = async (provider_id: string) => {
     return error;
   }
 };
+
+export const getProviderServices = async (provider_id: string) => {
+  try {
+    return await axiosAPIInstance
+      .get(`/providers/services?provider_id=${provider_id}`)
+      .then((res) => {
+        return res?.data;
+      });
+  } catch (error) {
+    return error;
+  }
+};
+
+// Update service status (approve/reject)
+export const updateServiceStatus = async (
+  service_id: string,
+  data: {
+    status: "1" | "2"; // "1"=approve/activate, "2"=reject
+    reason?: string; // required when status is "2"
+  }
+) => {
+  try {
+    return await axiosAPIInstance
+      .put(`/providers/services/${service_id}`, data)
+      .then((res) => {
+        return res?.data;
+      });
+  } catch (error) {
+    return error;
+  }
+};
