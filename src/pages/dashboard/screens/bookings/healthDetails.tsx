@@ -20,7 +20,7 @@ const HealthDetails: React.FC<HealthDetailsProps> = ({ booking }) => {
 
   // Default values if patient data is not available
   const healthData = {
-    bloodType: patient?.blood_type || "N/A",
+    bloodType: patient?.blood_group || "N/A",
     currentMedications: patient?.current_medications || "N/A",
     allergies: patient?.allergies || "None reported",
     chronicIllness: patient?.chronic_illness || "None reported",
