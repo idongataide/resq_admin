@@ -48,7 +48,7 @@ const PatientMetrics: React.FC = () => {
               <div className="rounded-full bg-[#fff] p-2 w-10 h-10 flex items-center justify-center mb-3">
                 <img src={Images.icon.patients} alt="patients" />
               </div>  
-              <div className="text-sm text-[#354959] mb-1">{metric.title}</div>
+              <div className="text-sm text-[#354959] mb-1 font-medium">{metric.title}</div>
               <div className="text-2xl text-[#354959] font-semibold">
                 {isLoading ? (
                     <Spin/>
