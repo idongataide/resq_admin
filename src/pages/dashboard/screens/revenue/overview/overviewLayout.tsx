@@ -3,7 +3,12 @@ import React from "react";
 import RevenueMetrics from "./revenueMetrics";
 import OperatorRevenue from "./operatorRevenue";
 
-const OverviewLayout: React.FC = () => {
+interface OverviewLayoutProps {
+  isNonEmergency?: boolean;
+}
+
+const OverviewLayout: React.FC<OverviewLayoutProps> = ({ isNonEmergency = false }) => {
+    console.log("OverviewLayout - isNonEmergency:", isNonEmergency);
     return (
         <>
         <div className="w-full">

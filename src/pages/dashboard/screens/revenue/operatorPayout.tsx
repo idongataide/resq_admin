@@ -1,13 +1,13 @@
-// StakeholderPayout.tsx
+// operatorPayout.tsx
 import { Table } from "antd";
 import { FiClock } from "react-icons/fi";
 import DateRangeFilter, { type Period } from "@/components/ui/DateRangeFilter";
 import { useState, useEffect } from "react";
-import { useStakeholderRevenue } from "@/hooks/useRevenue";
+import { useOperatorRevenue } from "@/hooks/useRevenue";
 import LoadingScreen from "../../common/LoadingScreen";
 
 
-interface StakeholderDataType {
+interface OperatorDataType {
   key: string;
   dateJoined: string;
   beneficiary: string;
@@ -16,11 +16,11 @@ interface StakeholderDataType {
   accountNumber: string;
 }
 
-interface StakeholderPayoutProps {
+interface OperatorPayoutProps {
   isNonEmergency?: boolean;
 }
 
-const StakeholderPayout: React.FC<StakeholderPayoutProps> = ({ isNonEmergency = false }) => {
+const OperatorPayout: React.FC<OperatorPayoutProps> = ({ isNonEmergency = false }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [selectedPeriod, setSelectedPeriod] = useState<Period>('yearly');
@@ -62,16 +62,16 @@ const StakeholderPayout: React.FC<StakeholderPayoutProps> = ({ isNonEmergency = 
   }, [selectedPeriod]);
 
   // Use different endpoint based on emergency/non-emergency
-  const { data, isLoading } = useStakeholderRevenue({
+  const { data, isLoading } = useOperatorRevenue({
     isNonEmergency,
+    period: selectedPeriod,
     start_date: dateRange.start_date,
     end_date: dateRange.end_date,
     page: currentPage,
-    item_per_page: pageSize
   });
 
   // Transform API data to table format
-  const tableData: StakeholderDataType[] = data?.map((item: any, index: number) => ({
+  const tableData: OperatorDataType[] = data?.map((item: any, index: number) => ({
     key: item._id || index.toString(),
     dateJoined: item.createdAt,
     beneficiary: item.name || 'N/A',
@@ -86,7 +86,7 @@ const StakeholderPayout: React.FC<StakeholderPayoutProps> = ({ isNonEmergency = 
       title: "Date Joined",
       dataIndex: "dateJoined",
       key: "dateJoined",
-      sorter: (a: StakeholderDataType, b: StakeholderDataType) => a.dateJoined.localeCompare(b.dateJoined),
+      sorter: (a: OperatorDataType, b: OperatorDataType) => a.dateJoined.localeCompare(b.dateJoined),
       render: (text: string) => (
         <div className="flex items-center gap-2">
           <FiClock className="text-gray-400" />
@@ -98,26 +98,26 @@ const StakeholderPayout: React.FC<StakeholderPayoutProps> = ({ isNonEmergency = 
       title: "Beneficiary",
       dataIndex: "beneficiary",
       key: "beneficiary",
-      sorter: (a: StakeholderDataType, b: StakeholderDataType) => a.beneficiary.localeCompare(b.beneficiary),
+      sorter: (a: OperatorDataType, b: OperatorDataType) => a.beneficiary.localeCompare(b.beneficiary),
     },
     {
       title: "Amount Due",
       dataIndex: "amountDue",
       key: "amountDue",
-      sorter: (a: StakeholderDataType, b: StakeholderDataType) => a.amountDue - b.amountDue,
+      sorter: (a: OperatorDataType, b: OperatorDataType) => a.amountDue - b.amountDue,
       render: (value: number) => <span className="font-medium">₦{value?.toLocaleString() || '0'}</span>,
     },
     {
       title: "Bank Name",
       dataIndex: "bankName",
       key: "bankName",
-      sorter: (a: StakeholderDataType, b: StakeholderDataType) => a.bankName.localeCompare(b.bankName),
+      sorter: (a: OperatorDataType, b: OperatorDataType) => a.bankName.localeCompare(b.bankName),
     },
     {
       title: "Account Number",
       dataIndex: "accountNumber",
       key: "accountNumber",
-      sorter: (a: StakeholderDataType, b: StakeholderDataType) => a.accountNumber.localeCompare(b.accountNumber),
+      sorter: (a: OperatorDataType, b: OperatorDataType) => a.accountNumber.localeCompare(b.accountNumber),
     },
   ];
 
@@ -127,13 +127,13 @@ const StakeholderPayout: React.FC<StakeholderPayoutProps> = ({ isNonEmergency = 
 
   return (
     <>
-      <p className="mb-4">Manage stakeholder payouts and beneficiary payments</p>
+      <p className="mb-4">Manage operator payouts and beneficiary payments</p>
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         {/* Header with Filter */}
         <div className="p-6 py-4 border-b border-gray-200">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <h1 className="text-[#354959] uppercase text-md font-bold">
-              Stakeholder Payouts
+              Operator Payouts
             </h1>  
             <DateRangeFilter
               selectedPeriod={selectedPeriod}
@@ -170,4 +170,4 @@ const StakeholderPayout: React.FC<StakeholderPayoutProps> = ({ isNonEmergency = 
   );
 };
 
-export default StakeholderPayout;
+export default OperatorPayout;

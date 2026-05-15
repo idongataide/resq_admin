@@ -7,13 +7,7 @@ import Images from "../../../components/images";
 const LoadingScreen: React.FC = () => {
   return (
     <div
-      className="w-full h-screen absolute top-0 left-0 flex flex-col justify-center items-center "
-      style={{
-        boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
-        backdropFilter: "blur(5px)",
-        border: "1px solid rgba(73, 154, 255, 0.3)",
-      }}
-    >
+      className="w-full h-screen absolute top-0 left-0 flex flex-col justify-center items-center ">
        <div className="relative flex justify-center items-center mb-7">
         <FaSpinner
           color="#000000"

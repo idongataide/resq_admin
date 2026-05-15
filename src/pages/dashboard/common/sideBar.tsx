@@ -47,6 +47,18 @@ const SiderScreen: React.FC = () => {
       title: "revenue",
       URL: "revenue",
       icon: Images.icon?.revenue,
+      children: [
+        {
+          id: 61,
+          title: "Emergency",
+          URL: "revenue/emergency",
+        },
+        {
+          id: 62,
+          title: "Non-emergency",
+          URL: "revenue/non-emergency",
+        },
+      ],
     },
     {
       id: 7,

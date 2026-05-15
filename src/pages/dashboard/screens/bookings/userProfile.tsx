@@ -161,7 +161,23 @@ const UserProfile: React.FC<UserProfileProps> = ({ booking }) => {
                 {booking.customer_data?.customer_name || 'N/A'}
               </h2>
               
-              {(operationStatus === 0) && (
+              {operationStatus === 0 && booking?.booking_type === 'non-emergency' && (
+                <div className="flex items-center gap-3 flex-wrap w-full sm:w-auto">
+                  <Button 
+                    icon={<FaEnvelope />} 
+                    className="rounded-lg flex bg-[#FDF6F6]! text-[#DB4A47]! border-0! items-center"
+                    size="large"
+                    onClick={() => window.location.href = `mailto:${booking.user_data?.email || ''}`}
+                  />
+                  <Button 
+                    className="rounded-xl px-3 py-2 bg-[#FDF6F6]! border-0! flex-1 sm:flex-none"
+                    icon={<FaPhone className="w-4 h-4 text-[#DB4A47]!" />}
+                    onClick={() => window.location.href = `tel:${booking.customer_data?.customer_phone || booking.phone_number}`}
+                  />
+                </div>
+              )}
+
+              {operationStatus === 0 && booking?.booking_type !== 'non-emergency' && (
                 <div className="flex items-center gap-3 flex-wrap w-full sm:w-auto">
                   <Button 
                     icon={<FaEnvelope />} 

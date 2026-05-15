@@ -187,6 +187,16 @@ export const routes = createBrowserRouter([
             <RevenueLayout />
           </Suspense>
         ),
+        children: [
+          {
+            path: "emergency",
+            element: <RevenueLayout  />
+          },
+          {
+            path: "non-emergency",
+            element: <RevenueLayout  />
+          }
+        ]
       },
       {
         path: "/my-team",

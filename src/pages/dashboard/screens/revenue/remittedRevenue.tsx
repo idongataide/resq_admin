@@ -1,232 +1,184 @@
-// OperatorRevenue.tsx
-import { Table, Button } from "antd";
+// RemittedRevenue.tsx (fixed spelling)
+import React, { useState, useMemo, useEffect } from 'react';
+import { Table } from "antd";
 import { FiClock } from "react-icons/fi";
+import { useRemittedRevenue } from "@/hooks/useRevenue";
+import LoadingScreen from '@/pages/dashboard/common/LoadingScreen';
+import DateRangeFilter, { type Period } from '@/components/ui/DateRangeFilter';
 
-interface OperatorData {
-  key: string;
-  dateJoined: string;
-  operatorName: string;
-  operatorEarning: string;
-  totalRequest: string;
-  totalRevenue: string;
-  tax: string;
-  ministryOfHealth: string;
-  govt: string;
+interface RemittedRevenueProps {
+  isNonEmergency?: boolean;
 }
 
-const OperatorRevenue = () => {
-  const data: OperatorData[] = [
-    {
-      key: "1",
-      dateJoined: "12th Jan. 2025",
-      operatorName: "John Doe Transport",
-      operatorEarning: "₦45,300",
-      totalRequest: "156",
-      totalRevenue: "₦78,500",
-      tax: "₦7,850",
-      ministryOfHealth: "₦3,925",
-      govt: "₦11,775",
-    },
-    {
-      key: "2",
-      dateJoined: "15th Jan. 2025",
-      operatorName: "Swift Logistics",
-      operatorEarning: "₦38,200",
-      totalRequest: "142",
-      totalRevenue: "₦65,800",
-      tax: "₦6,580",
-      ministryOfHealth: "₦3,290",
-      govt: "₦9,870",
-    },
-    {
-      key: "3",
-      dateJoined: "13th Jan. 2025",
-      operatorName: "City Cabs Ltd",
-      operatorEarning: "₦52,150",
-      totalRequest: "189",
-      totalRevenue: "₦89,200",
-      tax: "₦8,920",
-      ministryOfHealth: "₦4,460",
-      govt: "₦13,380",
-    },
-    {
-      key: "4",
-      dateJoined: "10th Jan. 2025",
-      operatorName: "Metro Movers",
-      operatorEarning: "₦29,800",
-      totalRequest: "98",
-      totalRevenue: "₦51,200",
-      tax: "₦5,120",
-      ministryOfHealth: "₦2,560",
-      govt: "₦7,680",
-    },
-    {
-      key: "5",
-      dateJoined: "14th Jan. 2025",
-      operatorName: "Express Deliveries",
-      operatorEarning: "₦41,500",
-      totalRequest: "167",
-      totalRevenue: "₦71,200",
-      tax: "₦7,120",
-      ministryOfHealth: "₦3,560",
-      govt: "₦10,680",
-    },
-    {
-      key: "6",
-      dateJoined: "11th Jan. 2025",
-      operatorName: "Royal Rides",
-      operatorEarning: "₦33,750",
-      totalRequest: "124",
-      totalRevenue: "₦58,300",
-      tax: "₦5,830",
-      ministryOfHealth: "₦2,915",
-      govt: "₦8,745",
-    },
-    {
-      key: "7",
-      dateJoined: "16th Jan. 2025",
-      operatorName: "Prime Transport",
-      operatorEarning: "₦47,200",
-      totalRequest: "178",
-      totalRevenue: "₦81,500",
-      tax: "₦8,150",
-      ministryOfHealth: "₦4,075",
-      govt: "₦12,225",
-    },
-    {
-      key: "8",
-      dateJoined: "12th Jan. 2025",
-      operatorName: "Elite Logistics",
-      operatorEarning: "₦36,400",
-      totalRequest: "135",
-      totalRevenue: "₦62,800",
-      tax: "₦6,280",
-      ministryOfHealth: "₦3,140",
-      govt: "₦9,420",
-    },
-  ];
+const RemittedRevenue: React.FC<RemittedRevenueProps> = ({ isNonEmergency = false }) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [selectedPeriod, setSelectedPeriod] = useState<Period>('yearly');
+  const [dateRange, setDateRange] = useState<{ start_date: string; end_date: string }>({
+    start_date: '',
+    end_date: ''
+  });
 
-  // Table columns with proper types
-  const columns = [
-    {
-      title: "Date Joined",
-      dataIndex: "dateJoined",
-      key: "dateJoined",
-      sorter: (a: OperatorData, b: OperatorData) => a.dateJoined.localeCompare(b.dateJoined),
-      render: (text: string) => (
-        <div className="flex items-center gap-2">
-          <FiClock className="text-gray-400" />
-          <span>{text}</span>
-        </div>
-      ),
-    },
-    {
-      title: "Operator Name",
-      dataIndex: "operatorName",
-      key: "operatorName",
-      sorter: (a: OperatorData, b: OperatorData) => a.operatorName.localeCompare(b.operatorName),
-    },
-    {
-      title: "Total Revenue",
-      dataIndex: "totalRevenue",
-      key: "totalRevenue",
-      sorter: (a: OperatorData, b: OperatorData) => {
-        const aValue = parseFloat(a.totalRevenue.replace(/[₦,]/g, ''));
-        const bValue = parseFloat(b.totalRevenue.replace(/[₦,]/g, ''));
-        return aValue - bValue;
+  // Function to calculate date range based on selected period
+  const calculateDateRange = (period: Period) => {
+    const today = new Date();
+    let startDate = new Date();
+    let endDate = new Date();
+
+    switch (period) {
+      case 'weekly':
+        startDate.setDate(today.getDate() - 7);
+        break;
+      case 'monthly':
+        startDate.setMonth(today.getMonth() - 1);
+        break;
+      case 'yearly':
+        startDate.setFullYear(today.getFullYear() - 1);
+        break;
+    }
+
+    setDateRange({
+      start_date: startDate.toISOString().split('T')[0],
+      end_date: endDate.toISOString().split('T')[0]
+    });
+  };
+
+  // Update date range when period changes
+  useEffect(() => {
+    calculateDateRange(selectedPeriod);
+  }, [selectedPeriod]);
+
+  const { data, isLoading } = useRemittedRevenue({
+    isNonEmergency,
+    start_date: dateRange.start_date,
+    end_date: dateRange.end_date,
+    page: currentPage,
+    item_per_page: pageSize
+  });
+
+  const processedData = useMemo(() => {
+    if (!data) return { data: [], columns: [] };
+
+    const uniqueStakeholders = new Set<string>();
+    const transformedData = data.map((revenue: any, index: number) => {
+      const rowData: any = {
+        id: revenue?.id || index,
+        date: revenue?.date,
+        totalRevenue: revenue?.totalAmount,
+        operatorEarning: revenue?.serviceFee,
+        originalItems: revenue?.items || []
+      };
+      
+      revenue?.items?.forEach((item: any) => {
+        const normalizedName = item.name.toLowerCase().replace(/\s+/g, '_');
+        uniqueStakeholders.add(normalizedName);
+        rowData[normalizedName] = item.amount;
+      });
+      
+      return rowData;
+    });
+
+    // Create dynamic columns for each stakeholder
+    const dynamicColumns = Array.from(uniqueStakeholders).map(stakeholderName => ({
+      title: stakeholderName.replace(/_/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
+      dataIndex: stakeholderName,
+      key: stakeholderName,
+      render: (value: number) => `₦${value?.toLocaleString() || '0'}`,
+      sorter: (a: any, b: any) => (a[stakeholderName] || 0) - (b[stakeholderName] || 0),
+    }));
+
+    // Static columns
+    const staticColumns = [
+      {
+        title: "Date",
+        dataIndex: "date",
+        key: "date",
+        render: (value: string) => (
+          <div className="flex items-center gap-2">
+            <FiClock className="text-gray-400" />
+            <span>{new Date(value).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+          </div>
+        ),
+        sorter: (a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime(),
       },
-    },
-    {
-      title: "Operator Revenue",
-      dataIndex: "operatorEarning",
-      key: "operatorEarning",
-      sorter: (a: OperatorData, b: OperatorData) => {
-        const aValue = parseFloat(a.operatorEarning.replace(/[₦,]/g, ''));
-        const bValue = parseFloat(b.operatorEarning.replace(/[₦,]/g, ''));
-        return aValue - bValue;
+      {
+        title: "Total Revenue",
+        dataIndex: "totalRevenue",
+        key: "totalRevenue",
+        render: (value: number) => <span className="font-medium">₦{value?.toLocaleString() || '0'}</span>,
+        sorter: (a: any, b: any) => (a.totalRevenue || 0) - (b.totalRevenue || 0),
       },
-    },
-    {
-      title: "Tax",
-      dataIndex: "tax",
-      key: "tax",
-      sorter: (a: OperatorData, b: OperatorData) => {
-        const aValue = parseFloat(a.tax.replace(/[₦,]/g, ''));
-        const bValue = parseFloat(b.tax.replace(/[₦,]/g, ''));
-        return aValue - bValue;
+      {
+        title: "Operator Revenue",
+        dataIndex: "operatorEarning",
+        key: "operatorEarning",
+        render: (value: number) => `₦${value?.toLocaleString() || '0'}`,
+        sorter: (a: any, b: any) => (a.operatorEarning || 0) - (b.operatorEarning || 0),
       },
-    },
-    {
-      title: "Ministry of Health",
-      dataIndex: "ministryOfHealth",
-      key: "ministryOfHealth",
-      sorter: (a: OperatorData, b: OperatorData) => {
-        const aValue = parseFloat(a.ministryOfHealth.replace(/[₦,]/g, ''));
-        const bValue = parseFloat(b.ministryOfHealth.replace(/[₦,]/g, ''));
-        return aValue - bValue;
-      },
-    },
-    {
-      title: "Govt",
-      dataIndex: "govt",
-      key: "govt",
-      sorter: (a: OperatorData, b: OperatorData) => {
-        const aValue = parseFloat(a.govt.replace(/[₦,]/g, ''));
-        const bValue = parseFloat(b.govt.replace(/[₦,]/g, ''));
-        return aValue - bValue;
-      },
-    },
-  ];
+    ];
+
+    const allColumns = [...staticColumns, ...dynamicColumns];
+
+    return {
+      data: transformedData,
+      columns: allColumns,
+    };
+
+  }, [data]);
+
+  const { data: tableData, columns } = processedData;
+
+  const paginatedData = useMemo(() => {
+    if (!tableData) return [];
+    const startIndex = (currentPage - 1) * pageSize;
+    return tableData.slice(startIndex, startIndex + pageSize);
+  }, [currentPage, pageSize, tableData]);
+
+  const handlePageChange = (page: number, size: number) => {
+    setCurrentPage(page);
+    setPageSize(size);
+  };
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
 
   return (
-    <>
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-        {/* Header with Filter and Add New */}
-        <div className="p-6 py-4 border-b border-gray-200">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <h1 className="text-[#354959] uppercase text-md font-bold">
-              Revenue per Operator
-            </h1>  
-            <div className="gap-3 flex">
-              <Button 
-                className="bg-[#F6F8F9]! rounded-lg flex items-center"
-                size="small"
-              >
-                Weekly
-              </Button>
-              <Button 
-                className="bg-[#F6F8F9]! rounded-lg flex items-center"
-                size="small"
-              >
-                Monthly
-              </Button>
-              <Button 
-                className="bg-[#F6F8F9]! rounded-lg flex items-center"
-                size="small"
-              >
-                Yearly
-              </Button>
-            </div>
-          </div>
+    <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+      {/* Header with Filter */}
+      <div className="p-6 py-4 border-b border-gray-200">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <h1 className="text-[#354959] uppercase text-md font-bold">
+            Remitted Revenue
+          </h1>  
+          <DateRangeFilter
+            selectedPeriod={selectedPeriod}
+            onPeriodChange={setSelectedPeriod}
+            periods={['weekly', 'monthly', 'yearly']}
+            variant="outline"
+          />
         </div>
-
-        {/* Table */}
-        <Table
-          columns={columns}
-          dataSource={data}
-          pagination={{
-            pageSize: 10,
-            showTotal: (total) => `Total ${total} operators`,
-            showSizeChanger: true,
-            showQuickJumper: true,
-          }}
-          className="border-none p-4"
-          rowClassName="hover:bg-gray-50 transition-colors"
-          scroll={{ x: 'max-content' }}
-        />
       </div>
-    </>
+
+      {/* Table */}
+      <Table
+        columns={columns}
+        dataSource={paginatedData}
+        pagination={tableData?.length > pageSize ? {
+          current: currentPage,
+          pageSize: pageSize,
+          total: tableData?.length,
+          showTotal: (total) => `Total ${total} records`,
+          showSizeChanger: true,
+          showQuickJumper: true,
+          onChange: handlePageChange,
+        } : undefined}
+        className="border-none p-4"
+        rowClassName="hover:bg-gray-50 transition-colors"
+        scroll={{ x: 'max-content' }}
+      />
+    </div>
   );
 };
 
-export default OperatorRevenue;
+export default RemittedRevenue;

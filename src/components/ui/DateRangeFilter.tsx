@@ -5,7 +5,7 @@ export type Period = 'daily' | 'weekly' | 'monthly' | 'yearly' | 'all';
 interface DateRangeFilterProps {
   selectedPeriod: Period;
   onPeriodChange: (period: Period) => void;
-  title: string;
+  title?: string;
   periods?: Period[];
   variant?: 'default' | 'outline';
 }
@@ -14,7 +14,7 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
   selectedPeriod,
   onPeriodChange,
   title,
-  periods = ['daily', 'weekly', 'monthly', 'yearly', 'all'],
+  periods = ['daily', 'weekly', 'monthly', 'yearly'],
   variant = 'default'
 }) => {
   const getButtonStyles = (isSelected: boolean) => {
