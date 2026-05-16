@@ -40,10 +40,10 @@ const BookingDetailsLayouts: React.FC = () => {
     return (
         <>
         <div className="w-full p-6">
-            <UserProfile booking={booking} />
+            <UserProfile booking={booking} bookingType={bookingType}/>
             <div className="grid grid-cols-1 lg:grid-cols-7 mt-5 gap-5">
                 <div className="col-span-1 lg:col-span-5">
-                    <RequestDetails booking={booking as any} />
+                    <RequestDetails booking={booking as any} bookingType={bookingType} />
                     <HealthDetails booking={booking as any} />
                     <ProviderDetails booking={booking as any} />
                     <RouteDetails booking={booking as any} />

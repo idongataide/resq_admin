@@ -14,10 +14,11 @@ import { Button } from "antd";
 import UpdateLocationModal from "./UpdateLocationModal";
 
 interface RequestDetailsProps {
-  booking: any; // Replace with your Booking type
+  booking: any; 
+  bookingType?: string;
 }
 
-const RequestDetails: React.FC<RequestDetailsProps> = ({ booking }) => {
+const RequestDetails: React.FC<RequestDetailsProps> = ({ booking, bookingType }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Format date function
@@ -118,6 +119,15 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ booking }) => {
             </div>
 
             <div className="space-y-6">
+              <div className="flex items-start gap-3">
+                <FiPhone className="w-4 h-4 text-[#808D97] mt-1" />
+                <div>
+                  <p className="text-[#808D97]">Request Type</p>
+                  <p className="font-medium text-[#000A0F]">
+                    {bookingType === "non-emergency" ? "Non-Emergency" : "Emergency"}
+                  </p>
+                </div>
+              </div>
               <div className="flex items-start gap-3">
                 <FiPhone className="w-4 h-4 text-[#808D97] mt-1" />
                 <div>
