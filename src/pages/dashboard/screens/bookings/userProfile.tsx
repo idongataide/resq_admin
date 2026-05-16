@@ -165,7 +165,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ booking, bookingType }) => {
                   >
                     <span 
                       className="w-2 h-2 rounded-full mr-1 bg-[#DE3631]"/>
-                     {bookingType === "non-emergency" ? "Non-Emergency" : "Emergency"}
+                     {bookingType === "non-emergency" ? "Non-Emergency Booking" : "Emergency Booking"}
                   </span>
               </h2>
               
