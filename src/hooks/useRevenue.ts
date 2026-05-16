@@ -67,7 +67,7 @@ export const useRemittedRevenue  = (params?: {
   
   // Choose endpoint based on emergency/non-emergency
   const endpoint = isNonEmergency 
-    ? '/payments/schedule-stakeholder-daily-revenue-operator'
+    ? '/payments/schedule-stakeholder-daily-revenue'
     : '/payments/stakeholder-daily-revenue';
 
   const { data, isLoading, mutate } = useSWR(

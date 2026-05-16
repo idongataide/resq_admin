@@ -36,13 +36,19 @@ const BookingMetrics: React.FC = () => {
       title: 'Cancelled Bookings',
       value: counts?.total_cancelled?.toLocaleString() || '0',
       bgColor: '#FEE9E7'
+    },
+    {
+      id: 'incoming',
+      title: 'Incoming Bookings',
+      value: counts?.total_incoming?.toLocaleString() || '0',
+      bgColor: '#e7fbfe'
     }
   ];
 
   return (
     <>
       <div className="w-full">
-        <div className="grid grid-cols-3 lg:grid-cols-5 gap-4 mb-6 bg-[#FFFFFF] p-4 rounded-lg">
+        <div className="grid grid-cols-3 lg:grid-cols-6 gap-4 mb-6 bg-[#FFFFFF] p-4 rounded-lg">
           {bookingMetrics.map((metric) => (
             <div 
               key={metric.id} 

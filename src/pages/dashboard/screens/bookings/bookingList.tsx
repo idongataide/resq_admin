@@ -27,6 +27,7 @@ interface Booking {
     user_id: string;
   };
   phone_number: string;
+  payment_status: number; // 0: Pending, 1: Paid
   payment_method: string;
   booking_status: string;
   operation_status: number; // 0: Incoming Booking, 1: Admin Accepted, 2: Assigned Operator, >2: show booking_status
@@ -306,16 +307,27 @@ const BookingList: React.FC<BookingListProps> = ({ bookingType }) => {
         <span>{record.customer_data?.customer_phone || record.phone_number || 'N/A'}</span>
       ),
     },
-    
-    // Only show Service Type for non-emergency bookings
-    ...(bookingType === "non-emergency" ? [{
-      title: "Service Type",
-      key: "booking_reason",
-      render: (_: any, record: Booking) => (
-        <span>{record.booking_reason || 'Emergency'}</span>
-      ),
-    }] : []),
-    
+   // Only show Service Type and Payment Status for non-emergency bookings
+    ...(bookingType === "non-emergency" ? [
+      {
+        title: "Service Type",
+        key: "booking_reason",
+        render: (_: any, record: Booking) => (
+          <span>{record.booking_reason || 'Emergency'}</span>
+        ),
+      },
+      {
+        title: "Payment Status",
+        key: "payment_status",
+        render: (_: any, record: Booking) => {
+          const paymentRecord: Booking = {
+            ...record,
+            booking_status: record.payment_status === 0 ? 'PENDING' : 'PAID',
+          };
+          return getStatusBadge(paymentRecord);
+        },
+      }
+    ] : []),
     {
       title: "Payment Method",
       dataIndex: "payment_method",
