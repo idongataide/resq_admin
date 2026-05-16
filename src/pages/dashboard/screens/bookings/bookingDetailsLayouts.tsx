@@ -44,7 +44,9 @@ const BookingDetailsLayouts: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-7 mt-5 gap-5">
                 <div className="col-span-1 lg:col-span-5">
                     <RequestDetails booking={booking as any} bookingType={bookingType} />
-                    <HealthDetails booking={booking as any} />
+                  {!isNonEmergency &&
+                     <HealthDetails booking={booking as any} />
+                    }
                     <ProviderDetails booking={booking as any} />
                     <RouteDetails booking={booking as any} />
                     <RatingsReview booking={booking as any} />

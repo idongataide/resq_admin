@@ -165,7 +165,7 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ booking, bookingType })
                 </div>
               </div>
 
-              <div className="flex items-start gap-3">
+              {/* <div className="flex items-start gap-3">
                 <FiNavigation className="w-4 h-4 text-[#808D97] mt-1" />
                 <div>
                   <p className="text-[#808D97]">Dropoff Coordinates</p>
@@ -175,7 +175,7 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ booking, bookingType })
                       : "N/A"}
                   </p>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
 
