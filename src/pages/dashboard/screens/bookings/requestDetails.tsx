@@ -108,11 +108,18 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ booking, bookingType })
               <div className="flex items-start gap-3">
                 <FiNavigation className="w-4 h-4 text-[#808D97] mt-1" />
                 <div>
-                  <p className="text-[#808D97]">Pickup Coordinates</p>
+                  <p className="text-[#808D97]">Landmark</p>
                   <p className="font-medium text-[#000A0F]">
-                    {booking.start_coord?.latitude && booking.start_coord?.longitude
-                      ? `${booking.start_coord.latitude.toFixed(4)}, ${booking.start_coord.longitude.toFixed(4)}`
-                      : "N/A"}
+                    {booking.user_data?.landmark || "N/A"}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <FiNavigation className="w-4 h-4 text-[#808D97] mt-1" />
+                <div>
+                  <p className="text-[#808D97]">Apartment Direction</p>
+                  <p className="font-medium text-[#000A0F]">
+                    {booking.user_data?.house_description || "N/A"}
                   </p>
                 </div>
               </div>
